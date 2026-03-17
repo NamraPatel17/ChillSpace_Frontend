@@ -6,13 +6,13 @@ import Signup from "../components/Signup";
 import { GuestNavbar } from "../components/guest/GuestNavbar";
 import { AdminSidebar } from "../components/admin/AdminSidebar";
 import { Home } from "../components/guest/HomePage";
-
+import { PropertyDetails } from "../components/guest/PropertyDetails";
 
 
 const router = createBrowserRouter([
 
   {
-    path: "/",
+    path: "/login",
     element: <Login />
   },
 
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "properties",
         element: <h1>Properties</h1>
+      },
+      {
+        path: "properties/:id",      // NEW: property detail page
+        element: <PropertyDetails />
       },
 
       {

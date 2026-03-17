@@ -26,7 +26,7 @@ export default function Login() {
         const role = res.data.role;
 
         if (role === "Guest") {
-          navigate("/user");
+          navigate("/user/home");
         }
         else if (role === "Admin") {
           navigate("/admin");

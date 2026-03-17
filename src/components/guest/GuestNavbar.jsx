@@ -1,10 +1,28 @@
-import React, { useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+// Frontend/chillspace/src/components/guest/GuestNavbar.jsx
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Home,
+  Search,
+  Calendar,
+  MessageSquare,
+  User,
+  Menu,
+  X,
+  LogOut
+} from "lucide-react";
+import { useState } from "react";
+
+const navigation = [
+  { name: "Home", href: "/user/home", icon: Home },
+  { name: "Search", href: "/user/search", icon: Search },
+  { name: "Bookings", href: "/user/bookings", icon: Calendar },
+  { name: "Profile", href: "/user/profile", icon: User }
+];
 
 export const GuestNavbar = () => {
-
-  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const logoutHandler = () => {
     localStorage.removeItem("user");
@@ -13,102 +31,165 @@ export const GuestNavbar = () => {
   };
 
   return (
-    <>
-      {/* NAVBAR */}
-      <nav className="bg-white shadow-md px-6 py-3 sticky top-0 z-50">
-        <div className="flex justify-between items-center">
-
-          {/* LOGO */}
-          <h1 className="text-xl font-bold text-blue-500">
-            ChillSpace
-          </h1>
-
-          {/* DESKTOP MENU */}
-          <ul className="hidden md:flex gap-6 items-center font-medium">
-
-            <li>
-              <Link to="/user/home" className="hover:text-blue-500">
-                Home
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/user/properties" className="hover:text-blue-500">
-                Properties
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/user/bookings" className="hover:text-blue-500">
-                My Bookings
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/user/profile" className="hover:text-blue-500">
-                Profile
-              </Link>
-            </li>
-
-            <li>
+    <div className="min-h-screen bg-white">
+      {/* Desktop Navigation */}
+      <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex flex-1 items-center justify-between">
+              <div className="flex-shrink-0 flex items-center">
+                <h1 className="text-2xl font-semibold text-blue-600">
+                  ChillSpace
+                </h1>
+              </div>
+              <div className="hidden sm:flex sm:space-x-4 justify-end flex-1">
+                {navigation.map((item) => {
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`inline-flex items-center px-3 py-2 border-b-2 text-sm transition-colors ${
+                        isActive
+                          ? "border-blue-500 text-gray-900"
+                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                      }`}
+                    >
+                      <item.icon className="h-4 w-4 mr-2" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4" />
+            <div className="flex items-center sm:hidden">
               <button
-                onClick={logoutHandler}
-                className="bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
               >
-                Logout
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
-            </li>
-
-          </ul>
-
-          {/* MOBILE MENU BUTTON */}
-          <button
-            className="md:hidden text-xl"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            ☰
-          </button>
-
+            </div>
+          </div>
         </div>
 
-        {/* MOBILE MENU */}
-        {isOpen && (
-          <ul className="md:hidden flex flex-col mt-4 gap-3 font-medium">
-
-            <li>
-              <Link to="/user/home">Home</Link>
-            </li>
-
-            <li>
-              <Link to="/user/properties">Properties</Link>
-            </li>
-
-            <li>
-              <Link to="/user/bookings">My Bookings</Link>
-            </li>
-
-            <li>
-              <Link to="/user/profile">Profile</Link>
-            </li>
-
-            <li>
-              <button
-                onClick={logoutHandler}
-                className="bg-red-500 text-white px-4 py-1 rounded-lg w-fit"
-              >
-                Logout
-              </button>
-            </li>
-
-          </ul>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-gray-200">
+            <div className="pt-2 pb-3 space-y-1">
+              {navigation.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center px-4 py-2 text-base ${
+                      isActive
+                        ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
+                        : "border-l-4 border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5 mr-3" />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         )}
-
       </nav>
 
-      {/* PAGE CONTENT */}
-      <div className="p-6 bg-gray-100 min-h-[calc(100vh-64px)]">
+      {/* Main content */}
+      <main>
         <Outlet />
-      </div>
-    </>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t mt-20">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">
+                About
+              </h3>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    How it works
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Newsroom
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">
+                Support
+              </h3>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">
+                Hosting
+              </h3>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    List your property
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Host resources
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase">
+                Legal
+              </h3>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    Terms of Service
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-gray-200 pt-8">
+            <p className="text-sm text-gray-400 text-center">
+              © 2026 ChillSpace. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 };
