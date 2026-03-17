@@ -5,6 +5,7 @@ import Signup from "../components/Signup";
 
 import { GuestNavbar } from "../components/guest/GuestNavbar";
 import { AdminSidebar } from "../components/admin/AdminSidebar";
+import { Home } from "../components/guest/HomePage";
 
 
 
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
 
       {
         path: "home",
-        element: <h1>Home</h1>
+        element: <Home/>
       },
 
       {
