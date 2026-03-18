@@ -12,7 +12,7 @@ import { PropertyDetails } from "../components/guest/PropertyDetails";
 const router = createBrowserRouter([
 
   {
-    path: "/login",
+    path: "/",
     element: <Login />
   },
 
