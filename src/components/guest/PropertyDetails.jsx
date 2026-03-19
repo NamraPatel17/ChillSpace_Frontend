@@ -84,8 +84,8 @@ export const PropertyDetails = () => {
   };
 
   const handleBooking = async () => {
-    if (!guestId) {
-      toast.error("Please login again");
+    if (!localStorage.getItem("userId") && !sessionStorage.getItem("userId")) {
+      toast.error("Please login to book");
       return;
     }
 
@@ -100,16 +100,14 @@ export const PropertyDetails = () => {
       return;
     }
 
-    const totalPrice = nights * (property?.pricePerNight || 0);
-
     try {
       setLoading(true);
-      const res = await axios.post("/booking", {
+      const res = await axios.post("/bookings", {
         propertyId: id,
-        guestId,
-        checkInDate,
-        checkOutDate,
-        totalPrice
+        guestId: localStorage.getItem("userId") || sessionStorage.getItem("userId"),
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate,
+        totalPrice: property.pricePerNight * nights
       });
 
       if (res.status === 201) {

@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -8,7 +8,7 @@ import {
   Star,
   MessageSquare,
   Menu,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -19,19 +19,12 @@ const navigation = [
   { name: "Bookings", href: "/admin/bookings", icon: Calendar },
   { name: "Payments", href: "/admin/payments", icon: DollarSign },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
-  { name: "Disputes", href: "/admin/disputes", icon: MessageSquare }
+  { name: "Disputes", href: "/admin/disputes", icon: MessageSquare },
 ];
 
-export const AdminSidebar = () => {
+export default function AdminLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const logoutHandler = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    navigate("/login");
-  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -71,19 +64,16 @@ export const AdminSidebar = () => {
               })}
             </nav>
             <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-              <button
-                onClick={logoutHandler}
-                className="flex-shrink-0 w-full group block"
-              >
+              <button className="flex-shrink-0 w-full group block">
                 <div className="flex items-center">
-                  <div className="ml-3">
+                  <div className="ml-3 text-left">
                     <p className="text-sm font-medium text-gray-700">
                       Admin User
                     </p>
-                    <span className="flex items-center text-xs text-gray-500 group-hover:text-gray-700">
+                    <button className="flex items-center text-xs text-gray-500 hover:text-gray-700">
                       <LogOut className="h-3 w-3 mr-1" />
                       Logout
-                    </span>
+                    </button>
                   </div>
                 </div>
               </button>
@@ -96,7 +86,7 @@ export const AdminSidebar = () => {
       {sidebarOpen && (
         <div className="md:hidden fixed inset-0 z-40 flex">
           <div
-            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
           <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
@@ -144,9 +134,7 @@ export const AdminSidebar = () => {
       <div className="flex flex-col flex-1 overflow-hidden">
         <div className="md:hidden">
           <div className="flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
-            <h1 className="text-lg font-semibold text-gray-900">
-              Admin Portal
-            </h1>
+            <h1 className="text-lg font-semibold text-gray-900">Admin Portal</h1>
             <button
               onClick={() => setSidebarOpen(true)}
               className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
@@ -161,4 +149,4 @@ export const AdminSidebar = () => {
       </div>
     </div>
   );
-};
+}

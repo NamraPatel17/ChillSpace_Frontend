@@ -1,11 +1,13 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, MapPin, Star, TrendingUp } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
+import axios from "axios";
 
-const featuredProperties = [
+// Fallbacks if the backend doesn't have enough properties yet 
+const fallbackProperties = [
   {
     id: 1,
     title: "Luxury Beach Villa",
@@ -13,8 +15,7 @@ const featuredProperties = [
     price: 450,
     rating: 4.9,
     reviews: 127,
-    image:
-      "https://images.unsplash.com/photo-1772398539093-fc7b4a6b1bfc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBiZWFjaCUyMHZpbGxhJTIwdmFjYXRpb24lMjByZW50YWx8ZW58MXx8fHwxNzczNzIxOTczfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+    image: "https://images.unsplash.com/photo-1772398539093-fc7b4a6b1bfc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBiZWFjaCUyMHZpbGxhJTIwdmFjYXRpb24lMjByZW50YWx8ZW58MXx8fHwxNzczNzIxOTczfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   },
   {
     id: 2,
@@ -23,8 +24,7 @@ const featuredProperties = [
     price: 325,
     rating: 4.8,
     reviews: 89,
-    image:
-      "https://images.unsplash.com/photo-1769021488077-3a921b227daf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtb3VudGFpbiUyMGNhYmlufGVufDF8fHx8MTc3MzcyMTk3M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+    image: "https://images.unsplash.com/photo-1769021488077-3a921b227daf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtb3VudGFpbiUyMGNhYmlufGVufDF8fHx8MTc3MzcyMTk3M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   },
   {
     id: 3,
@@ -33,8 +33,7 @@ const featuredProperties = [
     price: 275,
     rating: 4.7,
     reviews: 156,
-    image:
-      "https://images.unsplash.com/photo-1526547050953-b9fe7299eb69?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb3dudG93biUyMGNpdHklMjBhcGFydG1lbnQlMjBsb2Z0fGVufDF8fHx8MTc3MzcyMTk3NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+    image: "https://images.unsplash.com/photo-1526547050953-b9fe7299eb69?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb3dudG93biUyMGNpdHklMjBhcGFydG1lbnQlMjBsb2Z0fGVufDF8fHx8MTc3MzcyMTk3NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   },
   {
     id: 4,
@@ -43,9 +42,8 @@ const featuredProperties = [
     price: 200,
     rating: 4.9,
     reviews: 93,
-    image:
-      "https://images.unsplash.com/photo-1684602766513-7d0694cd5bd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsYWtlc2lkZSUyMGNvdHRhZ2UlMjBob21lfGVufDF8fHx8MTc3MzcyMTk3NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-  }
+    image: "https://images.unsplash.com/photo-1684602766513-7d0694cd5bd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsYWtlc2lkZSUyMGNvdHRhZ2UlMjBob21lfGVufDF8fHx8MTc3MzcyMTk3NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+  },
 ];
 
 const popularDestinations = [
@@ -54,10 +52,42 @@ const popularDestinations = [
   { name: "New York City", properties: 567 },
   { name: "San Francisco", properties: 289 },
   { name: "Seattle", properties: 198 },
-  { name: "Austin", properties: 176 }
+  { name: "Austin", properties: 176 },
 ];
 
 export const Home = () => {
+  const [featuredProperties, setFeaturedProperties] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchLocation, setSearchLocation] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchLiveProperties = async () => {
+      try {
+        const res = await axios.get("/properties");
+        if (res.data && res.data.length > 0) {
+           // Show at most 4 properties on the homepage
+           setFeaturedProperties(res.data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error("Failed to load featured properties from API", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchLiveProperties();
+  }, []);
+
+  const propertiesToRender = featuredProperties.length > 0 ? featuredProperties : fallbackProperties;
+
+  const handleSearch = () => {
+    if (searchLocation.trim()) {
+      navigate(`/user/properties?location=${encodeURIComponent(searchLocation.trim())}`);
+    } else {
+      navigate("/user/properties");
+    }
+  };
+
   return (
     <div>
       {/* Hero Section */}
@@ -78,6 +108,9 @@ export const Home = () => {
                 <input
                   type="text"
                   placeholder="Where are you going?"
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   className="flex-1 outline-none text-gray-900"
                 />
               </div>
@@ -86,27 +119,27 @@ export const Home = () => {
                   type="text"
                   placeholder="Check-in - Check-out"
                   className="flex-1 outline-none text-gray-900"
+                  readOnly
                 />
               </div>
-              <div className="flex-1 flex items-center px-4 py-3">
+              <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
                 <input
                   type="text"
                   placeholder="Guests"
                   className="flex-1 outline-none text-gray-900"
+                  readOnly
                 />
               </div>
-              <Link to="/user/properties">
-                <Button size="lg" className="w-full md:w-auto">
-                  <Search className="h-5 w-5 mr-2" />
-                  Search
-                </Button>
-              </Link>
+              <Button size="lg" className="w-full md:w-auto" onClick={handleSearch}>
+                <Search className="h-5 w-5 mr-2" />
+                Search
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Featured Properties */}
+      {/* Featured Properties (LIVE DATA ENABLED) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -122,51 +155,57 @@ export const Home = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProperties.map((property) => (
-            <Link
-              key={property.id}
-              to={`/user/properties/${property.id}`}
-              className="block"
-            >
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="relative h-48">
-                  <ImageWithFallback
-                    src={property.image}
-                    alt={property.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    {property.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2 flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {property.location}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="ml-1 text-sm font-medium">
-                        {property.rating}
-                      </span>
-                      <span className="ml-1 text-sm text-gray-500">
-                        ({property.reviews})
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-lg font-semibold text-gray-900">
-                        ${property.price}
-                      </span>
-                      <span className="text-sm text-gray-500">/night</span>
-                    </div>
+        {isLoading ? (
+          <div className="text-center py-10 text-gray-500">Loading premium spaces...</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {propertiesToRender.map((property) => (
+              <Link 
+                key={property._id || property.id} 
+                to={`/user/properties/${property._id || property.id}`}
+                className="block"
+              >
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full border border-gray-200 flex flex-col">
+                  <div className="relative h-48 bg-gray-100 flex-shrink-0">
+                    <img
+                      src={(property.images && property.images.length > 0) ? property.images[0] : property.image}
+                      alt={property.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                  <CardContent className="p-4 flex flex-col flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
+                      {property.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2 flex items-center line-clamp-1">
+                      <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+                      {property.location}
+                    </p>
+                    <div className="mt-auto pt-4 flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                        <span className="ml-1 text-sm font-medium">
+                          {property.rating ? property.rating.toFixed(1) : "New"}
+                        </span>
+                        {property.reviews && (
+                          <span className="ml-1 text-sm text-gray-500">
+                            ({property.reviews})
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <span className="text-lg font-semibold text-gray-900">
+                          ₹{property.pricePerNight || property.price}
+                        </span>
+                        <span className="text-sm text-gray-500">/night</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Popular Destinations */}

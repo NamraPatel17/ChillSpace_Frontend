@@ -22,7 +22,7 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const res = await axios.post("/user/login", { email, password });
+      const res = await axios.post("/users/login", { email, password });
 
       if (res.status === 200) {
         toast.success("Login Success 🎉");
@@ -48,11 +48,11 @@ export default function Login() {
         } else if (role === "Admin") {
           navigate("/admin/dashboard");
         } else if (role === "Host") {
-          toast.info("Host panel not added yet");
-          navigate("/user/home");
+          toast.success("Welcome to Host Dashboard");
+          navigate("/host");
         } else {
           toast.error("Invalid Role");
-          navigate("/");
+          navigate("/login");
         }
       }
     } catch (err) {

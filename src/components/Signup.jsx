@@ -53,10 +53,10 @@ export default function Signup() {
         password: formData.password
       };
 
-      const res = await axios.post("/user/register", payload);
+      const res = await axios.post("/users/register", payload);
       if (res.status === 201) {
         toast.success("User registered successfully 🎉");
-        navigate("/");
+        navigate("/login");
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration Failed");
@@ -290,7 +290,7 @@ export default function Signup() {
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
               <Link
-                to="/"
+                to="/login"
                 className="font-medium text-blue-600 hover:text-blue-700"
               >
                 Sign in

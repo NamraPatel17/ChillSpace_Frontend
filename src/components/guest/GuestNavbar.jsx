@@ -10,7 +10,7 @@ import {
   X,
   LogOut
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const navigation = [
   { name: "Home", href: "/user/home", icon: Home },
@@ -24,9 +24,20 @@ export const GuestNavbar = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, [location.pathname]);
+
   const logoutHandler = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("role");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
     navigate("/");
   };
 
@@ -62,7 +73,25 @@ export const GuestNavbar = () => {
                 })}
               </div>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4" />
+            <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+              {isLoggedIn ? (
+                <button
+                  onClick={logoutHandler}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Login
+                </Link>
+              )}
+            </div>
             <div className="flex items-center sm:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -100,6 +129,25 @@ export const GuestNavbar = () => {
                   </Link>
                 );
               })}
+              
+              {isLoggedIn ? (
+                <button
+                  onClick={logoutHandler}
+                  className="flex w-full items-center px-4 py-2 text-base border-l-4 border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                >
+                  <LogOut className="h-5 w-5 mr-3" />
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center px-4 py-2 text-base border-l-4 border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                >
+                  <User className="h-5 w-5 mr-3" />
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}
