@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -24,7 +24,14 @@ const navigation = [
 
 export default function AdminLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -64,19 +71,19 @@ export default function AdminLayout() {
               })}
             </nav>
             <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-              <button className="flex-shrink-0 w-full group block">
+              <div className="flex-shrink-0 w-full group block">
                 <div className="flex items-center">
                   <div className="ml-3 text-left">
                     <p className="text-sm font-medium text-gray-700">
                       Admin User
                     </p>
-                    <button className="flex items-center text-xs text-gray-500 hover:text-gray-700">
+                    <button onClick={handleLogout} className="flex items-center text-xs text-gray-500 hover:text-gray-700">
                       <LogOut className="h-3 w-3 mr-1" />
                       Logout
                     </button>
                   </div>
                 </div>
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -125,6 +132,15 @@ export default function AdminLayout() {
                   })}
                 </nav>
               </div>
+              <div className="border-t border-gray-200 p-4 mt-auto">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 w-full"
+                >
+                  <LogOut className="h-5 w-5 mr-3" />
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -133,14 +149,14 @@ export default function AdminLayout() {
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <div className="md:hidden">
-          <div className="flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
-            <h1 className="text-lg font-semibold text-gray-900">Admin Portal</h1>
+          <div className="flex items-center bg-white border-b border-gray-200 px-4 py-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-2 -ml-2 mr-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
               <Menu className="h-6 w-6" />
             </button>
+            <h1 className="text-lg font-semibold text-gray-900">Admin Portal</h1>
           </div>
         </div>
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6">

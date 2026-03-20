@@ -13,6 +13,7 @@ import Signup from "../components/Signup";
 import { GuestNavbar } from "../components/guest/GuestNavbar";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import { Home } from "../components/guest/HomePage";
+import SearchPage from "../components/guest/SearchPage";
 import { PropertyDetails } from "../components/guest/PropertyDetails";
 import HostLayout from "../components/host/HostLayout";
 import HostDashboard from "../components/host/HostDashboard";
@@ -24,6 +25,7 @@ import AddProperty from "../components/host/AddProperty";
 import HostSettings from "../components/host/HostSettings";
 import HostReviews from "../components/host/HostReviews";
 import HostMessages from "../components/host/HostMessages";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
 
@@ -53,8 +55,8 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "properties",
-        element: <h1>Properties</h1>
+        path: "search",
+        element: <SearchPage />
       },
       {
         path: "properties/:id",      // NEW: property detail page
@@ -77,7 +79,11 @@ const router = createBrowserRouter([
   /* HOST ROUTES */
   {
     path: "/host",
-    element: <HostLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={["Host"]}>
+        <HostLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -118,7 +124,11 @@ const router = createBrowserRouter([
   /* ADMIN ROUTES */
   {
     path: "/admin",
-    element: <AdminSidebar />,
+    element: (
+      <ProtectedRoute allowedRoles={["Admin"]}>
+        <AdminSidebar />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,

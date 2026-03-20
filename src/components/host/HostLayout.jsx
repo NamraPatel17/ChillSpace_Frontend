@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Home,
@@ -26,7 +26,14 @@ const navigation = [
 
 export default function HostLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -74,13 +81,13 @@ export default function HostLayout() {
             })}
           </nav>
           <div className="border-t border-gray-200 p-4">
-            <Link
-              to="/login"
-              className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50"
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50"
             >
               <LogOut className="h-5 w-5 mr-3" />
               Logout
-            </Link>
+            </button>
           </div>
         </div>
       </div>

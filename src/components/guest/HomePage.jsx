@@ -4,47 +4,9 @@ import { Search, MapPin, Star, TrendingUp } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
+import { DatePicker } from "../ui/datepicker";
 import axios from "axios";
 
-// Fallbacks if the backend doesn't have enough properties yet 
-const fallbackProperties = [
-  {
-    id: 1,
-    title: "Luxury Beach Villa",
-    location: "Malibu, California",
-    price: 450,
-    rating: 4.9,
-    reviews: 127,
-    image: "https://images.unsplash.com/photo-1772398539093-fc7b4a6b1bfc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBiZWFjaCUyMHZpbGxhJTIwdmFjYXRpb24lMjByZW50YWx8ZW58MXx8fHwxNzczNzIxOTczfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  },
-  {
-    id: 2,
-    title: "Mountain Cabin Retreat",
-    location: "Aspen, Colorado",
-    price: 325,
-    rating: 4.8,
-    reviews: 89,
-    image: "https://images.unsplash.com/photo-1769021488077-3a921b227daf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtb3VudGFpbiUyMGNhYmlufGVufDF8fHx8MTc3MzcyMTk3M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  },
-  {
-    id: 3,
-    title: "Downtown Loft",
-    location: "New York, NY",
-    price: 275,
-    rating: 4.7,
-    reviews: 156,
-    image: "https://images.unsplash.com/photo-1526547050953-b9fe7299eb69?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb3dudG93biUyMGNpdHklMjBhcGFydG1lbnQlMjBsb2Z0fGVufDF8fHx8MTc3MzcyMTk3NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  },
-  {
-    id: 4,
-    title: "Lakeside Cottage",
-    location: "Lake Tahoe, Nevada",
-    price: 200,
-    rating: 4.9,
-    reviews: 93,
-    image: "https://images.unsplash.com/photo-1684602766513-7d0694cd5bd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsYWtlc2lkZSUyMGNvdHRhZ2UlMjBob21lfGVufDF8fHx8MTc3MzcyMTk3NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  },
-];
 
 const popularDestinations = [
   { name: "Miami Beach", properties: 234 },
@@ -59,6 +21,9 @@ export const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchLocation, setSearchLocation] = useState("");
+  const [searchCheckIn, setSearchCheckIn] = useState("");
+  const [searchCheckOut, setSearchCheckOut] = useState("");
+  const [searchGuests, setSearchGuests] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,14 +43,16 @@ export const Home = () => {
     fetchLiveProperties();
   }, []);
 
-  const propertiesToRender = featuredProperties.length > 0 ? featuredProperties : fallbackProperties;
+  const propertiesToRender = featuredProperties;
 
   const handleSearch = () => {
-    if (searchLocation.trim()) {
-      navigate(`/user/properties?location=${encodeURIComponent(searchLocation.trim())}`);
-    } else {
-      navigate("/user/properties");
-    }
+    const params = new URLSearchParams();
+    if (searchLocation.trim()) params.append('location', searchLocation.trim());
+    if (searchCheckIn) params.append('checkIn', searchCheckIn);
+    if (searchCheckOut) params.append('checkOut', searchCheckOut);
+    if (searchGuests) params.append('guests', searchGuests);
+    
+    navigate(`/user/search?${params.toString()}`);
   };
 
   return (
@@ -107,6 +74,8 @@ export const Home = () => {
                 <MapPin className="h-5 w-5 text-gray-400 mr-2" />
                 <input
                   type="text"
+                  id="searchLocation"
+                  name="searchLocation"
                   placeholder="Where are you going?"
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
@@ -114,20 +83,33 @@ export const Home = () => {
                   className="flex-1 outline-none text-gray-900"
                 />
               </div>
-              <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
-                <input
-                  type="text"
-                  placeholder="Check-in - Check-out"
-                  className="flex-1 outline-none text-gray-900"
-                  readOnly
+              <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200 gap-2">
+                <DatePicker
+                  value={searchCheckIn}
+                  onChange={setSearchCheckIn}
+                  placeholder="Check in"
+                  className="w-1/2"
+                />
+                <span className="text-gray-400">-</span>
+                <DatePicker
+                  value={searchCheckOut}
+                  onChange={setSearchCheckOut}
+                  placeholder="Check out"
+                  className="w-1/2"
                 />
               </div>
               <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
                 <input
-                  type="text"
+                  type="number"
+                  min="1"
+                  max="20"
+                  id="searchGuests"
+                  name="searchGuests"
                   placeholder="Guests"
-                  className="flex-1 outline-none text-gray-900"
-                  readOnly
+                  value={searchGuests}
+                  onChange={(e) => setSearchGuests(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  className="flex-1 outline-none text-gray-900 bg-transparent"
                 />
               </div>
               <Button size="lg" className="w-full md:w-auto" onClick={handleSearch}>
@@ -150,7 +132,7 @@ export const Home = () => {
               Handpicked properties for your next getaway
             </p>
           </div>
-          <Link to="/user/properties">
+          <Link to="/user/search">
             <Button variant="outline">View All</Button>
           </Link>
         </div>
@@ -218,7 +200,7 @@ export const Home = () => {
             {popularDestinations.map((destination) => (
               <Link
                 key={destination.name}
-                to={`/user/properties?location=${encodeURIComponent(
+                to={`/user/search?location=${encodeURIComponent(
                   destination.name
                 )}`}
               >
