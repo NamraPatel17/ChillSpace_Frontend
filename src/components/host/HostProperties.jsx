@@ -40,7 +40,7 @@ export default function HostProperties() {
             Manage your vacation rental listings
           </p>
         </div>
-        <Link to="/host/properties/add" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700">
+        <Link to="/host/properties/add" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 bg-gray-900 text-white hover:bg-black">
           <Plus className="h-4 w-4 mr-2" />
           Add Property
         </Link>
@@ -94,7 +94,7 @@ export default function HostProperties() {
 
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                 <div>
-                  <p className="text-2xl font-semibold text-blue-600">
+                  <p className="text-2xl font-semibold text-gray-900">
                     {property.price}
                     <span className="text-sm text-gray-600 font-normal">
                       /night
@@ -127,7 +127,7 @@ export default function HostProperties() {
                   <Eye className="h-4 w-4 mr-1" />
                   View
                 </button>
-                <button className="flex items-center justify-center px-3 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <button className="flex items-center justify-center px-3 py-2 text-sm text-gray-900 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <Edit className="h-4 w-4 mr-1" />
                   Edit
                 </button>

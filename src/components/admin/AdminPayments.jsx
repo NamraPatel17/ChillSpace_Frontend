@@ -55,7 +55,7 @@ export default function AdminPayments() {
                   <span className="text-green-600">Active</span>
                 </div>
               </div>
-              <DollarSign className="h-8 w-8 text-blue-600" />
+              <DollarSign className="h-8 w-8 text-gray-900" />
             </div>
           </CardContent>
         </Card>
@@ -117,7 +117,7 @@ export default function AdminPayments() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">Guest Payments</p>
                   <p className="text-xl font-semibold text-gray-900">${data.stats.totalRevenue.toLocaleString()}</p>

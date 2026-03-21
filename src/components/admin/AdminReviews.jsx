@@ -10,7 +10,7 @@ const renderStars = (rating) => {
     <Star
       key={index}
       className={`h-4 w-4 ${
-        index < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+        index < rating ? "text-gray-900 fill-yellow-400" : "text-gray-300"
       }`}
     />
   ));
@@ -63,7 +63,7 @@ export default function AdminReviews() {
                 <p className="text-sm text-gray-600">Total Reviews</p>
                 <p className="text-2xl font-semibold text-gray-900">{data.stats.total}</p>
               </div>
-              <Star className="h-8 w-8 text-yellow-400 fill-yellow-400" />
+              <Star className="h-8 w-8 text-gray-900 fill-yellow-400" />
             </div>
           </CardContent>
         </Card>
@@ -74,7 +74,7 @@ export default function AdminReviews() {
                 <p className="text-sm text-gray-600">Average Rating</p>
                 <p className="text-2xl font-semibold text-gray-900">{data.stats.averageRating}</p>
               </div>
-              <Star className="h-8 w-8 text-yellow-400 fill-yellow-400" />
+              <Star className="h-8 w-8 text-gray-900 fill-yellow-400" />
             </div>
           </CardContent>
         </Card>
@@ -96,7 +96,7 @@ export default function AdminReviews() {
                 <p className="text-sm text-gray-600">Verified Reviews</p>
                 <p className="text-2xl font-semibold text-gray-900">{data.stats.verified}</p>
               </div>
-              <ThumbsUp className="h-8 w-8 text-blue-600" />
+              <ThumbsUp className="h-8 w-8 text-gray-900" />
             </div>
           </CardContent>
         </Card>
@@ -113,12 +113,12 @@ export default function AdminReviews() {
               <div key={item.stars} className="flex items-center gap-4">
                 <div className="flex items-center gap-1 w-20">
                   <span className="text-sm text-gray-700">{item.stars}</span>
-                  <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                  <Star className="h-4 w-4 text-gray-900 fill-yellow-400" />
                 </div>
                 <div className="flex-1">
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-yellow-400 h-2 rounded-full"
+                      className="bg-gray-900 h-2 rounded-full"
                       style={{ width: `${item.percentage}%` }}
                     ></div>
                   </div>
@@ -146,7 +146,7 @@ export default function AdminReviews() {
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-gray-900">{review.guest}</p>
                       {review.verified && (
-                        <Badge className="bg-blue-100 text-blue-800 text-xs shadow-none">Verified</Badge>
+                        <Badge className="bg-gray-100 text-blue-800 text-xs shadow-none">Verified</Badge>
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-1">

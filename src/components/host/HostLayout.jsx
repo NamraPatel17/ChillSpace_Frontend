@@ -49,7 +49,7 @@ export default function HostLayout() {
         ></div>
         <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white">
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-            <span className="text-xl font-bold text-blue-600">ChillSpace Host</span>
+            <span className="text-xl font-bold text-gray-900">ChillSpace Host</span>
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-500 hover:text-gray-700"
@@ -70,7 +70,7 @@ export default function HostLayout() {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
                     isActive
-                      ? "bg-blue-50 text-blue-600"
+                      ? "bg-gray-50 text-gray-900"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
@@ -96,7 +96,7 @@ export default function HostLayout() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-1 min-h-0 bg-white border-r border-gray-200">
           <div className="flex items-center h-16 px-6 border-b border-gray-200">
-            <span className="text-xl font-bold text-blue-600">ChillSpace Host</span>
+            <span className="text-xl font-bold text-gray-900">ChillSpace Host</span>
           </div>
           <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
@@ -110,7 +110,7 @@ export default function HostLayout() {
                   to={item.href}
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
                     isActive
-                      ? "bg-blue-50 text-blue-600"
+                      ? "bg-gray-50 text-gray-900"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
@@ -142,7 +142,7 @@ export default function HostLayout() {
           >
             <Menu className="h-6 w-6" />
           </button>
-          <span className="text-lg font-bold text-blue-600">ChillSpace Host</span>
+          <span className="text-lg font-bold text-gray-900">ChillSpace Host</span>
         </div>
 
         {/* Page content */}

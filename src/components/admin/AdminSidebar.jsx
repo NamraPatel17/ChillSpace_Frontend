@@ -56,13 +56,13 @@ export default function AdminLayout() {
                     to={item.href}
                     className={`group flex items-center px-2 py-2 text-sm rounded-md transition-colors ${
                       isActive
-                        ? "bg-blue-50 text-blue-600"
+                        ? "bg-gray-50 text-gray-900"
                         : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                   >
                     <item.icon
                       className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                        isActive ? "text-blue-600" : "text-gray-400"
+                        isActive ? "text-gray-900" : "text-gray-400"
                       }`}
                     />
                     {item.name}
@@ -117,13 +117,13 @@ export default function AdminLayout() {
                         onClick={() => setSidebarOpen(false)}
                         className={`group flex items-center px-2 py-2 text-sm rounded-md ${
                           isActive
-                            ? "bg-blue-50 text-blue-600"
+                            ? "bg-gray-50 text-gray-900"
                             : "text-gray-700 hover:bg-gray-50"
                         }`}
                       >
                         <item.icon
                           className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                            isActive ? "text-blue-600" : "text-gray-400"
+                            isActive ? "text-gray-900" : "text-gray-400"
                           }`}
                         />
                         {item.name}

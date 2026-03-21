@@ -9,10 +9,10 @@ export const Button = ({
   ...props
 }) => {
   const base =
-    "inline-flex items-center justify-center rounded-lg font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-lg font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-60 disabled:cursor-not-allowed";
 
   const variants = {
-    default: "bg-blue-600 text-white hover:bg-blue-700",
+    default: "bg-gray-900 text-white hover:bg-black",
     outline:
       "border border-gray-300 text-gray-900 bg-white hover:bg-gray-50"
   };

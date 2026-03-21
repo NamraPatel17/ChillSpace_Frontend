@@ -75,8 +75,8 @@ export default function HostReviews() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Average Rating */}
           <div className="text-center lg:border-r border-gray-200">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-blue-50 rounded-full mb-4">
-              <Star className="h-12 w-12 text-blue-600 fill-current" />
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-gray-50 rounded-full mb-4">
+              <Star className="h-12 w-12 text-yellow-400 fill-current" />
             </div>
             <p className="text-4xl font-bold text-gray-900">
               {stats.averageRating}
@@ -104,7 +104,7 @@ export default function HostReviews() {
                 </div>
                 <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-yellow-400 transition-all duration-500"
+                    className="h-full bg-gray-900 transition-all duration-500"
                     style={{ width: `${getPercentage(item.count)}%` }}
                   ></div>
                 </div>
@@ -132,8 +132,8 @@ export default function HostReviews() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-semibold text-blue-600">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="text-lg font-semibold text-gray-900">
                       {review.guest ? review.guest.charAt(0).toUpperCase() : "U"}
                     </span>
                   </div>
@@ -167,7 +167,7 @@ export default function HostReviews() {
 
             {/* Host Response */}
             {review.response ? (
-              <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-600">
+              <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-gray-900">
                 <p className="text-sm font-semibold text-gray-900 mb-2">
                   Your Response:
                 </p>

@@ -15,6 +15,8 @@ import AdminSidebar from "../components/admin/AdminSidebar";
 import { Home } from "../components/guest/HomePage";
 import SearchPage from "../components/guest/SearchPage";
 import { PropertyDetails } from "../components/guest/PropertyDetails";
+import GuestBookings from "../components/guest/GuestBookings";
+import GuestMessages from "../components/guest/GuestMessages";
 import HostLayout from "../components/host/HostLayout";
 import HostDashboard from "../components/host/HostDashboard";
 import HostBookings from "../components/host/HostBookings";
@@ -65,9 +67,12 @@ const router = createBrowserRouter([
 
       {
         path: "bookings",
-        element: <h1>My Bookings Page</h1>
+        element: <GuestBookings />
       },
-
+      {
+        path: "messages",
+        element: <GuestMessages />
+      },
       {
         path: "profile",
         element: <h1>User Profile Page</h1>

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { ArrowLeft, Upload, X, Plus, Check } from "lucide-react";
+import { ArrowLeft, Upload, X, Plus, Check, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
 import { Checkbox } from "../../components/ui/checkbox";
+import { CustomSelect } from "../../components/ui/custom-select";
 import axios from "axios";
 
 export default function AddProperty() {
@@ -162,9 +163,9 @@ export default function AddProperty() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
                     currentStep > step.number
-                      ? "bg-green-500 border-green-500"
+                      ? "bg-gray-800 border-green-500"
                       : currentStep === step.number
-                      ? "bg-blue-600 border-blue-600"
+                      ? "bg-gray-900 border-gray-900"
                       : "bg-white border-gray-300"
                   }`}
                 >
@@ -198,7 +199,7 @@ export default function AddProperty() {
               {index < steps.length - 1 && (
                 <div
                   className={`h-0.5 flex-1 mx-2 min-w-[30px] ${
-                    currentStep > step.number ? "bg-green-500" : "bg-gray-300"
+                    currentStep > step.number ? "bg-gray-800" : "bg-gray-300"
                   }`}
                 ></div>
               )}
@@ -230,19 +231,12 @@ export default function AddProperty() {
 
                 <div className="space-y-2">
                   <Label htmlFor="propertyType">Property Type *</Label>
-                  <select
-                    id="propertyType"
-                    onChange={handleInputChange}
+                  <CustomSelect
+                    options={propertyTypes}
                     value={formData.propertyType}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select property type</option>
-                    {propertyTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setFormData(prev => ({...prev, propertyType: val}))}
+                    placeholder="Select property type"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -257,7 +251,7 @@ export default function AddProperty() {
                     rows={6}
                     onChange={handleInputChange}
                     value={formData.description}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
                     placeholder="Describe your property, highlight unique features, nearby attractions, and what makes it special..."
                   />
                   <p className="text-xs text-gray-500">
@@ -391,7 +385,7 @@ export default function AddProperty() {
                           className="w-full h-full object-cover"
                         />
                         {index === 0 && (
-                          <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                          <div className="absolute top-2 left-2 bg-gray-900 text-white text-xs px-2 py-1 rounded">
                             Cover Photo
                           </div>
                         )}

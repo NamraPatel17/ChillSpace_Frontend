@@ -23,7 +23,7 @@ const getStatusIcon = (status) => {
 const getStatusColor = (status) => {
   switch (status) {
     case "Confirmed":
-      return "bg-blue-100 text-blue-800";
+      return "bg-gray-100 text-blue-800";
     case "Pending":
       return "bg-yellow-100 text-yellow-800";
     case "Completed":
@@ -78,7 +78,7 @@ export default function AdminBookings() {
                 <p className="text-sm text-gray-600">Total Bookings</p>
                 <p className="text-2xl font-semibold text-gray-900">{data.stats.total}</p>
               </div>
-              <Calendar className="h-8 w-8 text-blue-600" />
+              <Calendar className="h-8 w-8 text-gray-900" />
             </div>
           </CardContent>
         </Card>

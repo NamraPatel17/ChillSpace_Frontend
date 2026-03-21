@@ -13,7 +13,7 @@ export const Checkbox = ({
       checked={!!checked}
       onChange={(e) => onCheckedChange?.(e.target.checked)}
       className={clsx(
-        "h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500",
+        "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900",
         className
       )}
       {...props}

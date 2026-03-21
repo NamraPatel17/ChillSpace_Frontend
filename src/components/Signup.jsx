@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Mail, Lock, Eye, EyeOff, User, Phone } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Phone, ChevronDown } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Separator } from "./ui/separator";
+import { CustomSelect } from "./ui/custom-select";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ export default function Signup() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    phoneNumber: "",
     role: "Guest",
     password: "",
     confirmPassword: ""
@@ -48,7 +48,6 @@ export default function Signup() {
       const payload = {
         fullName: formData.fullName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
         role: formData.role,
         password: formData.password
       };
@@ -71,7 +70,7 @@ export default function Signup() {
         <div className="bg-white rounded-lg shadow-xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-600 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               ChillSpace
             </h1>
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -156,35 +155,15 @@ export default function Signup() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  type="tel"
-                  placeholder="+91 98765 43210"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
-              <select
-                id="role"
-                name="role"
+              <CustomSelect
+                options={["Guest", "Host"]}
                 value={formData.role}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="Guest">Guest</option>
-                <option value="Host">Host</option>
-              </select>
+                onChange={(val) => setFormData({ ...formData, role: val })}
+              />
             </div>
 
             <div className="space-y-2">
@@ -260,11 +239,11 @@ export default function Signup() {
                 className="text-sm text-gray-700 cursor-pointer"
               >
                 I agree to the{" "}
-                <a href="#" className="text-blue-600 hover:text-blue-700">
+                <a href="#" className="text-gray-900 hover:text-black">
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="#" className="text-blue-600 hover:text-blue-700">
+                <a href="#" className="text-gray-900 hover:text-black">
                   Privacy Policy
                 </a>
               </label>
@@ -281,7 +260,7 @@ export default function Signup() {
               Already have an account?{" "}
               <Link
                 to="/login"
-                className="font-medium text-blue-600 hover:text-blue-700"
+                className="font-medium text-gray-900 hover:text-black"
               >
                 Sign in
               </Link>

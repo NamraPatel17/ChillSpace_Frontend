@@ -1,6 +1,7 @@
-import { User, Bell, CreditCard, Shield, Globe, Save } from "lucide-react";
+import { User, Bell, CreditCard, Shield, Globe, Save, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { CustomSelect } from "../../components/ui/custom-select";
 
 export default function HostSettings() {
   const [profile, setProfile] = useState({
@@ -109,21 +110,21 @@ export default function HostSettings() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-1">
             <button 
               onClick={() => setActiveTab("Profile")}
-              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Profile' ? 'text-white bg-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Profile' ? 'text-white bg-gray-900' : 'text-gray-700 hover:bg-gray-50'}`}
             >
               <User className="h-5 w-5 mr-3" />
               Profile
             </button>
             <button 
               onClick={() => setActiveTab("Notifications")}
-              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Notifications' ? 'text-white bg-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Notifications' ? 'text-white bg-gray-900' : 'text-gray-700 hover:bg-gray-50'}`}
             >
               <Bell className="h-5 w-5 mr-3" />
               Notifications
             </button>
             <button 
               onClick={() => setActiveTab("Payout")}
-              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Payout' ? 'text-white bg-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Payout' ? 'text-white bg-gray-900' : 'text-gray-700 hover:bg-gray-50'}`}
             >
               <CreditCard className="h-5 w-5 mr-3" />
               Payout Methods
@@ -151,8 +152,8 @@ export default function HostSettings() {
 
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-2xl font-semibold text-blue-600">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="text-2xl font-semibold text-gray-900">
                       {getInitials(profile.fullName)}
                     </span>
                   </div>
@@ -206,17 +207,11 @@ export default function HostSettings() {
 
                   <div className="space-y-2">
                     <label htmlFor="language" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Language</label>
-                    <select
-                      id="language"
+                    <CustomSelect
+                      options={["English", "Spanish", "French", "German"]}
                       value={profile.language}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm h-10"
-                    >
-                      <option value="English">English</option>
-                      <option value="Spanish">Spanish</option>
-                      <option value="French">French</option>
-                      <option value="German">German</option>
-                    </select>
+                      onChange={(val) => setProfile(prev => ({...prev, language: val}))}
+                    />
                   </div>
                 </div>
 
@@ -227,14 +222,14 @@ export default function HostSettings() {
                     rows={4}
                     value={profile.bio || ""}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                     placeholder="Tell guests about yourself..."
                   />
                 </div>
               </div>
 
               <div className="flex justify-end mt-6">
-                <button onClick={saveProfile} disabled={saving} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2">
+                <button onClick={saveProfile} disabled={saving} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gray-900 text-white hover:bg-black h-10 px-4 py-2">
                   <Save className="h-4 w-4 mr-2" />
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
@@ -251,7 +246,7 @@ export default function HostSettings() {
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-3">
-                  <input type="checkbox" id="email" checked={profile.notificationPreferences.email} onChange={() => handleCheckboxChange('email')} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                  <input type="checkbox" id="email" checked={profile.notificationPreferences.email} onChange={() => handleCheckboxChange('email')} className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900" />
                   <div className="flex-1">
                     <label htmlFor="email" className="text-sm font-medium text-gray-900 cursor-pointer">
                       Email Notifications
@@ -263,7 +258,7 @@ export default function HostSettings() {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <input type="checkbox" id="sms" checked={profile.notificationPreferences.sms} onChange={() => handleCheckboxChange('sms')} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                  <input type="checkbox" id="sms" checked={profile.notificationPreferences.sms} onChange={() => handleCheckboxChange('sms')} className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900" />
                   <div className="flex-1">
                     <label htmlFor="sms" className="text-sm font-medium text-gray-900 cursor-pointer">
                       SMS Notifications
@@ -275,7 +270,7 @@ export default function HostSettings() {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <input type="checkbox" id="bookings" checked={profile.notificationPreferences.bookings} onChange={() => handleCheckboxChange('bookings')} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                  <input type="checkbox" id="bookings" checked={profile.notificationPreferences.bookings} onChange={() => handleCheckboxChange('bookings')} className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900" />
                   <div className="flex-1">
                     <label htmlFor="bookings" className="text-sm font-medium text-gray-900 cursor-pointer">
                       Booking Notifications
@@ -287,7 +282,7 @@ export default function HostSettings() {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <input type="checkbox" id="reviews" checked={profile.notificationPreferences.reviews} onChange={() => handleCheckboxChange('reviews')} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                  <input type="checkbox" id="reviews" checked={profile.notificationPreferences.reviews} onChange={() => handleCheckboxChange('reviews')} className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900" />
                   <div className="flex-1">
                     <label htmlFor="reviews" className="text-sm font-medium text-gray-900 cursor-pointer">
                       Review Notifications
@@ -299,7 +294,7 @@ export default function HostSettings() {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <input type="checkbox" id="marketing" checked={profile.notificationPreferences.marketing} onChange={() => handleCheckboxChange('marketing')} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
+                  <input type="checkbox" id="marketing" checked={profile.notificationPreferences.marketing} onChange={() => handleCheckboxChange('marketing')} className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900" />
                   <div className="flex-1">
                     <label htmlFor="marketing" className="text-sm font-medium text-gray-900 cursor-pointer">
                       Marketing Communications
@@ -312,7 +307,7 @@ export default function HostSettings() {
               </div>
 
               <div className="flex justify-end mt-6">
-                <button onClick={saveProfile} disabled={saving} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 h-10 px-4 py-2">
+                <button onClick={saveProfile} disabled={saving} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-gray-900 text-white hover:bg-black disabled:opacity-50 h-10 px-4 py-2">
                   <Save className="h-4 w-4 mr-2" />
                   {saving ? "Saving..." : "Save Preferences"}
                 </button>
@@ -328,11 +323,11 @@ export default function HostSettings() {
               </h2>
 
               <div className="space-y-4">
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <CreditCard className="h-6 w-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <CreditCard className="h-6 w-6 text-gray-900" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">

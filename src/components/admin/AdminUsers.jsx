@@ -64,7 +64,7 @@ export default function AdminUsers() {
                 <p className="text-sm text-gray-600">Total Users</p>
                 <p className="text-2xl font-semibold text-gray-900">{data.stats.total}</p>
               </div>
-              <UserCheck className="h-8 w-8 text-blue-600" />
+              <UserCheck className="h-8 w-8 text-gray-900" />
             </div>
           </CardContent>
         </Card>

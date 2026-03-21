@@ -180,7 +180,7 @@ export default function HostBookings() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button className="text-gray-900 hover:text-blue-900">
                       View
                     </button>
                   </td>

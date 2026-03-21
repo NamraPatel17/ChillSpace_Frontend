@@ -74,7 +74,7 @@ export default function HostEarnings() {
             <div>
               <p className="text-sm text-gray-600">Total Earnings</p>
               <p className="mt-2 text-3xl font-semibold text-gray-900">
-                ₹{stats.totalEarnings.toLocaleString()}
+                ${stats.totalEarnings.toLocaleString()}
               </p>
               <p className="mt-2 text-sm text-green-600 flex items-center">
                 <TrendingUp className="h-4 w-4 mr-1" />
@@ -89,19 +89,19 @@ export default function HostEarnings() {
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">This Month</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.thisMonthEarnings.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.thisMonthEarnings.toLocaleString()}</p>
           <p className="mt-2 text-sm text-gray-600">{stats.thisMonthBookingsCount} bookings</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">Pending Payouts</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.pendingPayouts.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.pendingPayouts.toLocaleString()}</p>
           <p className="mt-2 text-sm text-gray-600">{stats.pendingCount} transactions</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">Average Per Booking</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.averagePerBooking.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.averagePerBooking.toLocaleString()}</p>
           <p className="mt-2 text-sm text-gray-600">Across all properties</p>
         </div>
       </div>
@@ -126,15 +126,15 @@ export default function HostEarnings() {
             <div className="w-full text-center text-gray-500 py-10">No earnings data available yet.</div>
           ) : earningsData.map((data) => (
             <div key={data.month} className="flex-1 flex flex-col items-center">
-              <div className="w-full bg-blue-100 rounded-t-lg relative group">
+              <div className="w-full bg-gray-100 rounded-t-lg relative group">
                 <div
-                  className="w-full bg-blue-600 rounded-t-lg transition-all hover:bg-blue-700"
+                  className="w-full bg-gray-900 rounded-t-lg transition-all hover:bg-black"
                   style={{
                     height: `${(data.amount / maxAmount) * 200}px`,
                   }}
                 >
                   <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded z-10">
-                    ₹{data.amount.toLocaleString()}
+                    ${data.amount.toLocaleString()}
                   </div>
                 </div>
               </div>

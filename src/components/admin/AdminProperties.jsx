@@ -53,7 +53,7 @@ export default function AdminProperties() {
                 <p className="text-sm text-gray-600">Total Properties</p>
                 <p className="text-2xl font-semibold text-gray-900">{data.stats.total}</p>
               </div>
-              <Home className="h-8 w-8 text-blue-600" />
+              <Home className="h-8 w-8 text-gray-900" />
             </div>
           </CardContent>
         </Card>
@@ -105,7 +105,7 @@ export default function AdminProperties() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 max-w-[60%] truncate">Host: {property.host}</span>
                   <div className="flex items-center flex-shrink-0">
-                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    <Star className="h-4 w-4 text-gray-900 fill-yellow-400" />
                     <span className="text-sm ml-1">{property.rating}</span>
                   </div>
                 </div>

@@ -42,8 +42,8 @@ export default function AdminDashboard() {
       value: dashboardData.stats.totalUsers.toLocaleString(),
       change: "+12.5%",
       icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-gray-900",
+      bgColor: "bg-gray-50",
     },
     {
       name: "Active Listings",
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
                 <span className="text-sm font-semibold text-gray-900">76%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: "76%" }}></div>
+                <div className="bg-gray-900 h-2 rounded-full" style={{ width: "76%" }}></div>
               </div>
 
               <div className="flex items-center justify-between mt-6">

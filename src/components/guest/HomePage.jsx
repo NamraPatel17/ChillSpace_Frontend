@@ -1,24 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, MapPin, Star, TrendingUp } from "lucide-react";
+import { Search, MapPin, Star, TrendingUp, Users, Calendar } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { DatePicker } from "../ui/datepicker";
 import axios from "axios";
 
-
-const popularDestinations = [
-  { name: "Miami Beach", properties: 234 },
-  { name: "Los Angeles", properties: 456 },
-  { name: "New York City", properties: 567 },
-  { name: "San Francisco", properties: 289 },
-  { name: "Seattle", properties: 198 },
-  { name: "Austin", properties: 176 },
-];
-
 export const Home = () => {
   const [featuredProperties, setFeaturedProperties] = useState([]);
+  const [liveDestinations, setLiveDestinations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchLocation, setSearchLocation] = useState("");
   const [searchCheckIn, setSearchCheckIn] = useState("");
@@ -31,8 +22,25 @@ export const Home = () => {
       try {
         const res = await axios.get("/properties");
         if (res.data && res.data.length > 0) {
-           // Show at most 4 properties on the homepage
-           setFeaturedProperties(res.data.slice(0, 4));
+           // Show at most 8 properties on the homepage for a 2-line layout
+           setFeaturedProperties(res.data.slice(0, 8));
+
+           // Dynamically generate Popular Destinations from the database!
+           const cityMap = {};
+           res.data.forEach(p => {
+             const loc = p.location;
+             if (loc) {
+               if (!cityMap[loc]) {
+                 cityMap[loc] = { 
+                   name: loc, 
+                   count: 0
+                 };
+               }
+               cityMap[loc].count += 1;
+             }
+           });
+           const sortedCities = Object.values(cityMap).sort((a,b) => b.count - a.count).slice(0, 6);
+           setLiveDestinations(sortedCities);
         }
       } catch (error) {
         console.error("Failed to load featured properties from API", error);
@@ -58,65 +66,91 @@ export const Home = () => {
   return (
     <div>
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Find Your Perfect Vacation Rental
+      <div 
+        className="relative text-white py-32 md:py-48"
+        style={{ 
+          backgroundImage: "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2670&auto=format&fit=crop')", 
+          backgroundSize: "cover", 
+          backgroundPosition: "center" 
+        }}
+      >
+        {/* Dark overlay for better text readability and moody aesthetic */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+          <div className="text-left mb-10 max-w-3xl">
+            <h1 className="text-5xl md:text-7xl font-semibold mb-4 drop-shadow-2xl leading-tight tracking-tight text-white">
+              Explore your place <br/> to stay
             </h1>
-            <p className="text-xl mb-8 text-blue-100">
-              Discover unique places to stay around the world
-            </p>
+          </div>
 
-            {/* Search Bar */}
-            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-2 flex flex-col md:flex-row gap-2">
-              <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
-                <MapPin className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                  type="text"
-                  id="searchLocation"
-                  name="searchLocation"
-                  placeholder="Where are you going?"
-                  value={searchLocation}
-                  onChange={(e) => setSearchLocation(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="flex-1 outline-none text-gray-900"
-                />
-              </div>
-              <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200 gap-2">
-                <DatePicker
-                  value={searchCheckIn}
-                  onChange={setSearchCheckIn}
-                  placeholder="Check in"
-                  className="w-1/2"
-                />
-                <span className="text-gray-400">-</span>
-                <DatePicker
-                  value={searchCheckOut}
-                  onChange={setSearchCheckOut}
-                  placeholder="Check out"
-                  className="w-1/2"
-                />
-              </div>
-              <div className="flex-1 flex items-center px-4 py-3 border-b md:border-b-0 md:border-r border-gray-200">
-                <input
-                  type="number"
-                  min="1"
-                  max="20"
-                  id="searchGuests"
-                  name="searchGuests"
-                  placeholder="Guests"
-                  value={searchGuests}
-                  onChange={(e) => setSearchGuests(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="flex-1 outline-none text-gray-900 bg-transparent"
-                />
-              </div>
-              <Button size="lg" className="w-full md:w-auto" onClick={handleSearch}>
-                <Search className="h-5 w-5 mr-2" />
-                Search
-              </Button>
+          {/* Redesigned Search Bar - Translucent Dark Pill Layout */}
+          <div className="max-w-5xl bg-[#1e1e1e]/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl p-2 flex flex-col md:flex-row items-center gap-2 border border-white/20">
+            
+            {/* Location Pill */}
+            <div className="flex-[1.2] flex items-center px-6 py-4 bg-[#2a2a2a]/60 hover:bg-[#333333]/80 transition-colors rounded-full w-full">
+              <Search className="h-5 w-5 text-gray-400 mr-3 shrink-0" />
+              <input
+                type="text"
+                id="searchLocation"
+                name="searchLocation"
+                autoComplete="off"
+                placeholder="Stavanger, Norway"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="flex-1 outline-none text-white bg-transparent placeholder-gray-400 text-base [&:-webkit-autofill]:[transition-delay:9999s] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+              />
             </div>
+
+            {/* Dates Pill */}
+            <div className="flex-[1.5] flex items-center px-5 py-4 bg-[#2a2a2a]/60 hover:bg-[#333333]/80 transition-colors rounded-full w-full gap-2">
+              <Calendar className="h-5 w-5 text-gray-400 shrink-0 mr-1" />
+              <DatePicker
+                value={searchCheckIn}
+                onChange={setSearchCheckIn}
+                placeholder="Check in"
+                variant="dark"
+                showIcon={false}
+                className="w-1/2 flex-1 !h-auto !py-0"
+              />
+              <DatePicker
+                value={searchCheckOut}
+                onChange={setSearchCheckOut}
+                placeholder="Checkout"
+                variant="dark"
+                showIcon={false}
+                className="w-1/2 flex-1 !h-auto !py-0"
+              />
+            </div>
+
+            {/* Guests Pill */}
+            <div className="flex-[0.8] flex items-center px-6 py-4 bg-[#2a2a2a]/60 hover:bg-[#333333]/80 transition-colors rounded-full w-full">
+              <Users className="h-5 w-5 text-gray-400 mr-3 shrink-0" />
+              <input
+                type="number"
+                min="1"
+                max="20"
+                id="searchGuests"
+                name="searchGuests"
+                autoComplete="off"
+                placeholder="Guests"
+                value={searchGuests}
+                onChange={(e) => setSearchGuests(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="flex-1 outline-none text-white bg-transparent placeholder-gray-400 text-base [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&:-webkit-autofill]:[transition-delay:9999s] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+              />
+            </div>
+
+            {/* Search Button */}
+            <Button 
+              size="lg" 
+              className="w-full md:w-auto !rounded-full !bg-[#d2a679] hover:!bg-[#c19568] !text-black font-semibold text-lg px-10 py-7 transition-all active:scale-95 shadow-lg flex-shrink-0 border-0" 
+              onClick={handleSearch}
+            >
+              Search
+            </Button>
+            
           </div>
         </div>
       </div>
@@ -149,7 +183,7 @@ export const Home = () => {
               >
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full border border-gray-200 flex flex-col">
                   <div className="relative h-48 bg-gray-100 flex-shrink-0">
-                    <img
+                    <ImageWithFallback
                       src={(property.images && property.images.length > 0) ? property.images[0] : property.image}
                       alt={property.title}
                       className="w-full h-full object-cover"
@@ -177,7 +211,7 @@ export const Home = () => {
                       </div>
                       <div className="text-right">
                         <span className="text-lg font-semibold text-gray-900">
-                          ₹{property.pricePerNight || property.price}
+                          ${property.pricePerNight || property.price}
                         </span>
                         <span className="text-sm text-gray-500">/night</span>
                       </div>
@@ -197,20 +231,21 @@ export const Home = () => {
             Popular Destinations
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {popularDestinations.map((destination) => (
+            {liveDestinations.map((destination) => (
               <Link
                 key={destination.name}
                 to={`/user/search?location=${encodeURIComponent(
                   destination.name
                 )}`}
+                className="block"
               >
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4 text-center">
-                    <h3 className="font-medium text-gray-900">
+                    <h3 className="font-medium text-gray-900 truncate">
                       {destination.name}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      {destination.properties} properties
+                      {destination.count} {destination.count === 1 ? 'property' : 'properties'}
                     </p>
                   </CardContent>
                 </Card>
@@ -227,8 +262,8 @@ export const Home = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <Search className="h-8 w-8 text-blue-600" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+              <Search className="h-8 w-8 text-gray-900" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Easy Search</h3>
             <p className="text-gray-600">

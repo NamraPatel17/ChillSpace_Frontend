@@ -1,13 +1,14 @@
-import { MessageSquare, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle, AlertCircle, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { CustomSelect } from "../../components/ui/custom-select";
 
 const statusConfig = {
   pending: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
-  "in-progress": { color: "bg-blue-100 text-blue-800", icon: MessageSquare },
+  "in-progress": { color: "bg-gray-100 text-blue-800", icon: MessageSquare },
   resolved: { color: "bg-green-100 text-green-800", icon: CheckCircle },
 };
 
@@ -20,6 +21,7 @@ const priorityConfig = {
 export default function AdminDisputes() {
   const [data, setData] = useState({ disputes: [], stats: { pending: 0, inProgress: 0, resolved: 0 } });
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     const fetchDisputes = async () => {
@@ -52,12 +54,17 @@ export default function AdminDisputes() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="resolved">Resolved</option>
-          </select>
+          <CustomSelect
+            options={[
+              { value: "all", label: "All Status" },
+              { value: "pending", label: "Pending" },
+              { value: "in-progress", label: "In Progress" },
+              { value: "resolved", label: "Resolved" }
+            ]}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            className="w-40"
+          />
         </div>
       </div>
 
@@ -79,8 +86,8 @@ export default function AdminDisputes() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-blue-50">
-                <AlertCircle className="h-6 w-6 text-blue-600" />
+              <div className="p-3 rounded-lg bg-gray-50">
+                <AlertCircle className="h-6 w-6 text-gray-900" />
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-600">In Progress</p>

@@ -5,7 +5,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import clsx from "clsx";
 
-export function DatePicker({ value, onChange, placeholder, className }) {
+export function DatePicker({ value, onChange, placeholder, className, variant = "light", showIcon = true }) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -28,18 +28,22 @@ export function DatePicker({ value, onChange, placeholder, className }) {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={clsx(
-          "flex h-10 w-full items-center justify-start rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors",
-          !value && "text-gray-500"
+          "flex h-10 w-full items-center justify-start rounded-md px-3 py-2 text-sm focus:outline-none transition-colors",
+          variant === "dark" 
+            ? "bg-transparent text-white border-none focus:ring-1 focus:ring-white/50" 
+            : "border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-gray-900",
+          !value && (variant === "dark" ? "text-gray-400" : "text-gray-500"),
+          className
         )}
       >
-        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+        {showIcon && <CalendarIcon className={clsx("mr-3 h-5 w-5 shrink-0", variant === "dark" ? "text-gray-400" : "text-gray-500")} />}
         <span className="truncate">
           {value ? format(dateObj, "MMM d, yyyy") : placeholder}
         </span>
       </button>
       
       {isOpen && (
-        <div className="absolute top-12 left-0 z-50 rounded-md border bg-white p-3 shadow-xl" style={{ width: 'max-content' }}>
+        <div className="absolute top-12 left-0 z-50 rounded-md border bg-white p-3 shadow-xl text-gray-900" style={{ width: 'max-content' }}>
           <DayPicker
             mode="single"
             selected={dateObj}

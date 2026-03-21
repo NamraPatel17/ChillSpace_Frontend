@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, Star, Filter, Grid, List } from "lucide-react";
+import { MapPin, Star, Filter, Grid, List, ChevronDown } from "lucide-react";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -22,6 +22,8 @@ export default function SearchPage() {
   const [selectedBedrooms, setSelectedBedrooms] = useState("Any");
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [sortBy, setSortBy] = useState("Recommended");
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortOptions = ["Recommended", "Price: Low to High", "Price: High to Low", "Rating: High to Low"];
   
   // URL Param Initializations
   const [searchParams, setSearchParams] = useSearchParams();
@@ -119,7 +121,7 @@ export default function SearchPage() {
               {/* Location */}
               <div className="mb-6">
                 <Label className="mb-3 block">Location</Label>
-                <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-blue-500">
+                <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-gray-900">
                   <MapPin className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
                   <input
                     type="text"
@@ -160,7 +162,7 @@ export default function SearchPage() {
                   placeholder="Number of guests"
                   value={searchGuests}
                   onChange={(e) => setSearchGuests(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900"
                 />
               </div>
 
@@ -254,43 +256,71 @@ export default function SearchPage() {
         </aside>
 
         {/* Results */}
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">
                 {properties.length} Properties Found
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 mt-1 hidden sm:block">
                 Based on your search criteria
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <select 
-                id="sortBy"
-                name="sortBy"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div 
+                className="relative" 
+                tabIndex={-1} 
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setIsSortOpen(false);
+                  }
+                }}
               >
-                <option>Recommended</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Rating: High to Low</option>
-              </select>
-              <div className="flex border border-gray-300 rounded-md">
+                <button
+                  type="button"
+                  onClick={() => setIsSortOpen(!isSortOpen)}
+                  className="flex items-center justify-between w-36 sm:w-48 rounded-lg border border-gray-300 bg-white px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors shadow-sm"
+                >
+                  <span className="truncate font-medium text-left flex-1">{sortBy}</span>
+                  <ChevronDown className="h-4 w-4 text-gray-500 ml-1 sm:ml-2 flex-shrink-0" />
+                </button>
+                
+                {isSortOpen && (
+                  <div className="absolute right-0 z-50 mt-1 w-40 sm:w-48 rounded-lg border border-gray-200 bg-white shadow-lg py-1 overflow-hidden pointer-events-auto">
+                    {sortOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => {
+                          setSortBy(option);
+                          setIsSortOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                          sortBy === option 
+                            ? "bg-gray-100 font-semibold text-gray-900 border-l-2 border-gray-900" 
+                            : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="hidden sm:flex border border-gray-300 rounded-lg overflow-hidden bg-white">
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
-                  className="rounded-r-none"
+                  className="!rounded-none !border-0 !shadow-none !m-0 !h-full"
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
+                <div className="w-[1px] bg-gray-200" />
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  className="rounded-l-none"
+                  className="!rounded-none !border-0 !shadow-none !m-0 !h-full"
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -303,7 +333,7 @@ export default function SearchPage() {
           ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {properties.map((property) => (
-                <Link key={property._id} to={`/user/properties/${property._id}`}>
+                <Link key={property._id} to={`/user/properties/${property._id}`} className="block">
                   <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
                     <div className="relative h-48">
                       <ImageWithFallback
@@ -349,7 +379,7 @@ export default function SearchPage() {
           ) : (
             <div className="space-y-4">
               {properties.map((property) => (
-                <Link key={property._id} to={`/user/properties/${property._id}`}>
+                <Link key={property._id} to={`/user/properties/${property._id}`} className="block">
                   <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
                     <div className="flex flex-col md:flex-row">
                       <div className="md:w-64 h-48 flex-shrink-0">

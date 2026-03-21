@@ -133,14 +133,14 @@ export default function HostMessages() {
                   onClick={() => setSelectedConversation(conversation.id)}
                   className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
                     selectedConversation === conversation.id
-                      ? "bg-blue-50 border-l-4 border-l-blue-600"
+                      ? "bg-gray-50 border-l-4 border-l-gray-900"
                       : ""
                   }`}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="font-semibold text-blue-600">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                        <span className="font-semibold text-gray-900">
                           {conversation.avatar}
                         </span>
                       </div>
@@ -151,7 +151,7 @@ export default function HostMessages() {
                           {conversation.guest}
                         </p>
                         {conversation.unread > 0 && (
-                          <span className="ml-2 bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full">
+                          <span className="ml-2 bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded-full">
                             {conversation.unread}
                           </span>
                         )}
@@ -178,8 +178,8 @@ export default function HostMessages() {
             <div className="p-4 border-b border-gray-200 bg-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="font-semibold text-blue-600">SJ</span>
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="font-semibold text-gray-900">SJ</span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">
@@ -206,7 +206,7 @@ export default function HostMessages() {
                   <div
                     className={`max-w-md px-4 py-2 rounded-lg ${
                       message.sender === "host"
-                        ? "bg-blue-600 text-white"
+                        ? "bg-gray-900 text-white"
                         : "bg-white text-gray-900 border border-gray-200"
                     }`}
                   >
@@ -214,7 +214,7 @@ export default function HostMessages() {
                     <p
                       className={`text-xs mt-1 ${
                         message.sender === "host"
-                          ? "text-blue-100"
+                          ? "text-gray-100"
                           : "text-gray-500"
                       }`}
                     >

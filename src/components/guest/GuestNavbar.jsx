@@ -16,6 +16,7 @@ const navigation = [
   { name: "Home", href: "/user/home", icon: Home },
   { name: "Search", href: "/user/search", icon: Search },
   { name: "Bookings", href: "/user/bookings", icon: Calendar },
+  { name: "Messages", href: "/user/messages", icon: MessageSquare },
   { name: "Profile", href: "/user/profile", icon: User }
 ];
 
@@ -41,15 +42,38 @@ export const GuestNavbar = () => {
     navigate("/");
   };
 
+  const isHome = location.pathname.includes('/home') || location.pathname === '/' || location.pathname === '/user';
+  
+  const navRootClass = isHome 
+    ? "absolute top-0 w-full z-50 bg-transparent" 
+    : "bg-white shadow-sm sticky top-0 z-50 transition-colors";
+
+  const brandTextColor = isHome ? "text-white drop-shadow-md" : "text-gray-900";
+  const activeLinkColor = isHome ? "text-white border-white drop-shadow-md" : "text-gray-900 border-gray-900";
+  const inactiveLinkColor = isHome ? "text-gray-200 border-transparent hover:border-white/50 hover:text-white drop-shadow" : "text-gray-500 border-transparent hover:border-gray-300 hover:text-gray-700";
+  const buttonStyle = isHome ? "bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border-white/30" : "bg-gray-900 hover:bg-black text-white border-transparent";
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen ${isHome ? 'bg-transparent' : 'bg-white'}`}>
       {/* Desktop Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className={navRootClass}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex flex-1 items-center justify-between">
-              <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-2xl font-semibold text-blue-600">
+            <div className="flex items-center sm:hidden mr-2">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 -ml-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
+            </div>
+            <div className="flex flex-1 items-center sm:justify-start h-full">
+              <div className="flex-shrink-0 flex items-center absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0 sm:left-auto pt-1">
+                <h1 className={`text-2xl font-bold tracking-tight ${brandTextColor}`}>
                   ChillSpace
                 </h1>
               </div>
@@ -60,10 +84,8 @@ export const GuestNavbar = () => {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className={`inline-flex items-center px-3 py-2 border-b-2 text-sm transition-colors ${
-                        isActive
-                          ? "border-blue-500 text-gray-900"
-                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                      className={`inline-flex items-center px-3 py-2 border-b-2 text-sm font-medium transition-colors mt-2 ${
+                        isActive ? activeLinkColor : inactiveLinkColor
                       }`}
                     >
                       <item.icon className="h-4 w-4 mr-2" />
@@ -77,7 +99,7 @@ export const GuestNavbar = () => {
               {isLoggedIn ? (
                 <button
                   onClick={logoutHandler}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
+                  className={`inline-flex items-center px-4 py-2 border text-sm font-medium rounded-full shadow-sm transition-colors ${buttonStyle}`}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -85,31 +107,19 @@ export const GuestNavbar = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-colors"
+                  className={`inline-flex items-center px-4 py-2 border text-sm font-medium rounded-full shadow-sm transition-colors ${buttonStyle}`}
                 >
                   <User className="h-4 w-4 mr-2" />
                   Login
                 </Link>
               )}
             </div>
-            <div className="flex items-center sm:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
-            </div>
           </div>
         </div>
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-gray-200">
+          <div className="sm:hidden border-t border-gray-200 bg-white shadow-2xl absolute w-full left-0 z-50 pb-2">
             <div className="pt-2 pb-3 space-y-1">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -118,10 +128,10 @@ export const GuestNavbar = () => {
                     key={item.name}
                     to={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-2 text-base ${
+                    className={`flex items-center px-4 py-2 text-base font-medium ${
                       isActive
-                        ? "bg-blue-50 border-l-4 border-blue-500 text-blue-700"
-                        : "border-l-4 border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                        ? "bg-gray-100 border-l-4 border-gray-900 text-gray-900"
+                        : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                   >
                     <item.icon className="h-5 w-5 mr-3" />
