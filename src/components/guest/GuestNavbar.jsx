@@ -178,14 +178,14 @@ export const GuestNavbar = () => {
               </h3>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/how-it-works" className="text-sm text-gray-600 hover:text-gray-900">
                     How it works
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/newsroom" className="text-sm text-gray-600 hover:text-gray-900">
                     Newsroom
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -195,14 +195,14 @@ export const GuestNavbar = () => {
               </h3>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/help-center" className="text-sm text-gray-600 hover:text-gray-900">
                     Help Center
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/contact" className="text-sm text-gray-600 hover:text-gray-900">
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -212,14 +212,14 @@ export const GuestNavbar = () => {
               </h3>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/host/properties/add" className="text-sm text-gray-600 hover:text-gray-900">
                     List your property
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/host-resources" className="text-sm text-gray-600 hover:text-gray-900">
                     Host resources
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -229,14 +229,14 @@ export const GuestNavbar = () => {
               </h3>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/privacy" className="text-sm text-gray-600 hover:text-gray-900">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                  <Link to="/terms" className="text-sm text-gray-600 hover:text-gray-900">
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

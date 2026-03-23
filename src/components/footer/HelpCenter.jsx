@@ -1,0 +1,22 @@
+import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+
+export default function HelpCenter() {
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-8 sm:p-12 border border-gray-100 text-center">
+        <div className="mb-8 flex justify-start">
+          <Link to={-1} className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Link>
+        </div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Help Center</h1>
+        <p className="text-gray-600 text-lg">Find answers to frequently asked questions and get support from our team.</p>
+        <div className="mt-8 p-4 bg-blue-50 text-blue-800 rounded-lg">
+          <p>Support knowledge base is currently being updated. For immediate assistance, please use the Contact Us page.</p>
+        </div>
+      </div>
+    </div>
+  );
+}

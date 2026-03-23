@@ -5,6 +5,7 @@ const badgeVariants = {
   secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
   destructive: "bg-red-600 text-white hover:bg-red-700",
   outline: "text-gray-950 border border-gray-200 hover:bg-gray-100",
+  success: "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200",
 }
 
 function Badge({ className = "", variant = "default", ...props }) {

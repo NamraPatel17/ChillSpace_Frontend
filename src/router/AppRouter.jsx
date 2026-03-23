@@ -9,6 +9,15 @@ import AdminUsers from "../components/admin/AdminUsers";
 
 import Login from "../components/Login";
 import Signup from "../components/Signup";
+import ForgotPassword from "../components/ForgotPassword";
+import ResetPassword from "../components/ResetPassword";
+import TermsOfService from "../components/footer/TermsOfService";
+import PrivacyPolicy from "../components/footer/PrivacyPolicy";
+import HowItWorks from "../components/footer/HowItWorks";
+import Newsroom from "../components/footer/Newsroom";
+import HelpCenter from "../components/footer/HelpCenter";
+import HostResources from "../components/footer/HostResources";
+import ContactUs from "../components/footer/ContactUs";
 
 import { GuestNavbar } from "../components/guest/GuestNavbar";
 import AdminSidebar from "../components/admin/AdminSidebar";
@@ -17,6 +26,7 @@ import SearchPage from "../components/guest/SearchPage";
 import { PropertyDetails } from "../components/guest/PropertyDetails";
 import GuestBookings from "../components/guest/GuestBookings";
 import GuestMessages from "../components/guest/GuestMessages";
+import GuestProfile from "../components/guest/GuestProfile";
 import HostLayout from "../components/host/HostLayout";
 import HostDashboard from "../components/host/HostDashboard";
 import HostBookings from "../components/host/HostBookings";
@@ -43,6 +53,42 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup />
+  },
+  {
+    path: "/forgotpassword",
+    element: <ForgotPassword />
+  },
+  {
+    path: "/reset-password/:token",
+    element: <ResetPassword />
+  },
+  {
+    path: "/terms",
+    element: <TermsOfService />
+  },
+  {
+    path: "/privacy",
+    element: <PrivacyPolicy />
+  },
+  {
+    path: "/how-it-works",
+    element: <HowItWorks />
+  },
+  {
+    path: "/newsroom",
+    element: <Newsroom />
+  },
+  {
+    path: "/help-center",
+    element: <HelpCenter />
+  },
+  {
+    path: "/host-resources",
+    element: <HostResources />
+  },
+  {
+    path: "/contact",
+    element: <ContactUs />
   },
 
   /* USER ROUTES */
@@ -75,7 +121,7 @@ const router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <h1>User Profile Page</h1>
+        element: <GuestProfile />
       }
 
     ]

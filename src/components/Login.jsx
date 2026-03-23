@@ -178,7 +178,7 @@ export default function Login() {
               </div>
               <Link
                 to="/forgotpassword"
-                className="text-sm text-gray-900 hover:text-black"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
               >
                 Forgot password?
               </Link>
@@ -195,7 +195,7 @@ export default function Login() {
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="font-medium text-gray-900 hover:text-black"
+                className="font-medium text-blue-600 hover:text-blue-700"
               >
                 Sign up for free
               </Link>
@@ -206,13 +206,13 @@ export default function Login() {
         {/* Footer */}
         <p className="mt-6 text-center text-sm text-gray-600">
           By continuing, you agree to ChillSpace&apos;s{" "}
-          <a href="#" className="text-gray-900 hover:text-black">
+          <Link to="/terms" className="text-blue-600 hover:text-blue-700 font-medium">
             Terms of Service
-          </a>{" "}
+          </Link>{" "}
           and{" "}
-          <a href="#" className="text-gray-900 hover:text-black">
+          <Link to="/privacy" className="text-blue-600 hover:text-blue-700 font-medium">
             Privacy Policy
-          </a>
+          </Link>
         </p>
       </div>
     </div>

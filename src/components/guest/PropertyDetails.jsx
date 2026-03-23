@@ -11,6 +11,7 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { CustomSelect } from "../ui/custom-select";
+import { DatePicker } from "../ui/datepicker";
 
 // Removes dummy reviews block completely
 
@@ -219,7 +220,7 @@ export const PropertyDetails = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-10">
+        <div className="order-2 lg:order-1 lg:col-span-2 space-y-10">
           {/* Property Details */}
           <div>
             <h2 className="text-2xl font-semibold mb-5 tracking-tight">Property Details</h2>
@@ -382,7 +383,7 @@ export const PropertyDetails = () => {
         </div>
 
         {/* Booking Card */}
-        <div className="lg:col-span-1">
+        <div className="order-1 lg:order-2 lg:col-span-1">
           <Card className="sticky top-24 shadow-none border border-gray-200 rounded-lg">
             <CardContent className="p-6">
               <div className="mb-6">
@@ -395,29 +396,19 @@ export const PropertyDetails = () => {
               </div>
 
               <div className="space-y-3 mb-6">
-                <div className="border border-gray-300 rounded-md p-3">
-                  <div className="flex items-center text-sm">
-                    <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                    <input
-                      type="date"
-                      value={checkInDate}
-                      onChange={(e) => setCheckInDate(e.target.value)}
-                      className="flex-1 text-gray-900 outline-none bg-transparent cursor-pointer w-full"
-                    />
-                  </div>
-                </div>
+                <DatePicker
+                  value={checkInDate}
+                  onChange={setCheckInDate}
+                  placeholder="Check in"
+                  className="w-full"
+                />
                 
-                <div className="border border-gray-300 rounded-md p-3">
-                  <div className="flex items-center text-sm">
-                    <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                    <input
-                      type="date"
-                      value={checkOutDate}
-                      onChange={(e) => setCheckOutDate(e.target.value)}
-                      className="flex-1 text-gray-900 outline-none bg-transparent cursor-pointer w-full"
-                    />
-                  </div>
-                </div>
+                <DatePicker
+                  value={checkOutDate}
+                  onChange={setCheckOutDate}
+                  placeholder="Check out"
+                  className="w-full"
+                />
                 
                 <div className="border border-gray-300 rounded-md p-3">
                   <div className="flex items-center text-sm">

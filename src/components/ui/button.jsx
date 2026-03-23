@@ -14,7 +14,9 @@ export const Button = ({
   const variants = {
     default: "bg-gray-900 text-white hover:bg-black",
     outline:
-      "border border-gray-300 text-gray-900 bg-white hover:bg-gray-50"
+      "border border-gray-300 text-gray-900 bg-white hover:bg-gray-50",
+    destructive:
+      "bg-red-600 text-white hover:bg-red-700"
   };
 
   const sizes = {

@@ -13,6 +13,7 @@ export default function AdminUsers() {
     stats: { total: 0, activeHosts: 0, suspended: 0 }
   });
   const [loading, setLoading] = useState(true);
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -32,6 +33,118 @@ export default function AdminUsers() {
     };
     fetchUsers();
   }, []);
+
+  const handleVerifyUser = async (userId, userName) => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/admin/users/${userId}/verify`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Immediately reflect state on frontend
+      setData(prev => ({
+        ...prev,
+        users: prev.users.map(u => u.id === userId ? { ...u, verified: true } : u)
+      }));
+      import('react-toastify').then(({ toast }) => toast.success(`User ${userName} verified successfully!`));
+    } catch (err) {
+      import('react-toastify').then(({ toast }) => toast.error("Failed to verify user."));
+    }
+    setOpenMenuId(null);
+  };
+
+  const handleSuspendUser = async (userId, userName) => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/admin/users/${userId}/suspend`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Immediately reflect state on frontend
+      setData(prev => {
+        const newUsers = prev.users.map(u => u.id === userId ? { ...u, status: "Suspended" } : u);
+        const hostAdjustment = prev.users.find(u => u.id === userId)?.role === "Host" ? -1 : 0;
+        return {
+          ...prev,
+          users: newUsers,
+          stats: {
+            ...prev.stats,
+            suspended: prev.stats.suspended + 1,
+            activeHosts: prev.stats.activeHosts + hostAdjustment
+          }
+        };
+      });
+      import('react-toastify').then(({ toast }) => toast.info(`User ${userName} suspended.`));
+    } catch (err) {
+      import('react-toastify').then(({ toast }) => toast.error("Failed to suspend user."));
+    }
+    setOpenMenuId(null);
+  };
+
+  const handleUnsuspendUser = async (userId, userName) => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/admin/users/${userId}/unsuspend`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Immediately reflect state on frontend
+      setData(prev => {
+        const newUsers = prev.users.map(u => u.id === userId ? { ...u, status: "Active" } : u);
+        const hostAdjustment = prev.users.find(u => u.id === userId)?.role === "Host" ? 1 : 0;
+        return {
+          ...prev,
+          users: newUsers,
+          stats: {
+            ...prev.stats,
+            suspended: Math.max(0, prev.stats.suspended - 1),
+            activeHosts: prev.stats.activeHosts + hostAdjustment
+          }
+        };
+      });
+      import('react-toastify').then(({ toast }) => toast.success(`User ${userName} reactivated.`));
+    } catch (err) {
+      import('react-toastify').then(({ toast }) => toast.error("Failed to reactivate user."));
+    }
+    setOpenMenuId(null);
+  };
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`Are you sure you want to permanently delete ${userName}?`)) {
+      setOpenMenuId(null);
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/admin/users/${userId}/delete`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Immediately reflect state on frontend
+      setData(prev => {
+        const newUsers = prev.users.map(u => u.id === userId ? { ...u, status: "Deleted" } : u);
+        const userWasHost = prev.users.find(u => u.id === userId)?.role === "Host";
+        const userWasSuspended = prev.users.find(u => u.id === userId)?.status === "Suspended";
+        
+        let suspendedAdj = 0;
+        let hostAdj = 0;
+        if (userWasSuspended) suspendedAdj = -1;
+        if (userWasHost && !userWasSuspended) hostAdj = -1;
+
+        return {
+          ...prev,
+          users: newUsers,
+          stats: {
+            ...prev.stats,
+            suspended: Math.max(0, prev.stats.suspended + suspendedAdj),
+            activeHosts: Math.max(0, prev.stats.activeHosts + hostAdj),
+            total: prev.stats.total
+          }
+        };
+      });
+      import('react-toastify').then(({ toast }) => toast.success(`User ${userName} deleted.`));
+    } catch (err) {
+      import('react-toastify').then(({ toast }) => toast.error("Failed to delete user."));
+    }
+    setOpenMenuId(null);
+  };
 
   const filteredUsers = data.users.filter(
     (user) =>
@@ -132,17 +245,31 @@ export default function AdminUsers() {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <Badge variant={user.role === "Host" ? "default" : "secondary"}>
+                      <Badge 
+                        variant="outline" 
+                        className={
+                          user.role === "Admin" ? "bg-purple-100 text-purple-800 border-purple-200" :
+                          user.role === "Host" ? "bg-blue-100 text-blue-800 border-blue-200" :
+                          "bg-gray-100 text-gray-800 border-gray-200"
+                        }
+                      >
                         {user.role}
                       </Badge>
                     </td>
                     <td className="py-4 px-4">
-                      <Badge
-                        variant={user.status === "Active" ? "default" : "destructive"}
-                        className={user.status === "Active" ? "bg-green-100 text-green-800 border-green-200" : ""}
-                      >
-                        {user.status}
+                      <Badge variant={user.verified ? "success" : "secondary"}>
+                        {user.verified ? "Verified" : "Unverified"}
                       </Badge>
+                      {user.status === "Suspended" && (
+                        <Badge variant="destructive" className="ml-2 bg-red-100 text-red-800 border-red-200">
+                          Suspended
+                        </Badge>
+                      )}
+                      {user.status === "Deleted" && (
+                        <Badge variant="destructive" className="ml-2 bg-gray-900 text-white border-gray-950">
+                          Deleted
+                        </Badge>
+                      )}
                     </td>
                     <td className="py-4 px-4">
                       <span className="text-sm text-gray-600">
@@ -152,10 +279,53 @@ export default function AdminUsers() {
                     <td className="py-4 px-4">
                       <span className="text-sm text-gray-600">{user.joined}</span>
                     </td>
-                    <td className="py-4 px-4">
-                      <Button variant="ghost" size="sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
+                    <td className="py-4 px-4 relative">
+                      <div className="flex flex-row items-center justify-end">
+                        <Button variant="ghost" size="sm" onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}>
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                        
+                        {openMenuId === user.id && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setOpenMenuId(null)}></div>
+                            <div className="absolute right-6 top-10 w-40 bg-white border border-gray-200 shadow-xl rounded-md z-50 py-1 overflow-hidden">
+                              {user.role !== "Admin" && (
+                                <>
+                                  {!user.verified && (
+                                    <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" onClick={() => handleVerifyUser(user.id, user.name)}>
+                                      Verify User
+                                    </button>
+                                  )}
+                                  {user.status !== "Suspended" && user.status !== "Deleted" && (
+                                    <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" onClick={() => handleSuspendUser(user.id, user.name)}>
+                                      Suspend User
+                                    </button>
+                                  )}
+                                  {user.status === "Suspended" && (
+                                    <button className="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors" onClick={() => handleUnsuspendUser(user.id, user.name)}>
+                                      Unsuspend User
+                                    </button>
+                                  )}
+                                  {user.status !== "Deleted" && (
+                                    <button className="w-full text-left px-4 py-2 text-sm text-red-700 font-medium hover:bg-red-100 transition-colors border-t border-gray-100 mt-1" onClick={() => handleDeleteUser(user.id, user.name)}>
+                                      Delete Account
+                                    </button>
+                                  )}
+                                  {user.verified && user.status === "Suspended" && (
+                                    <div className="px-4 py-2 text-sm text-gray-400 italic bg-gray-50 border-t border-gray-100 mt-1">Status: Suspended</div>
+                                  )}
+                                  {user.status === "Deleted" && (
+                                    <div className="px-4 py-2 text-sm text-gray-400 italic bg-gray-50 border-t border-gray-100 mt-1">Account Deleted</div>
+                                  )}
+                                </>
+                              )}
+                              {user.role === "Admin" && (
+                                <div className="px-4 py-2 text-sm text-gray-400 italic">No actions available</div>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )) : (

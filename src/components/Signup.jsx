@@ -239,13 +239,13 @@ export default function Signup() {
                 className="text-sm text-gray-700 cursor-pointer"
               >
                 I agree to the{" "}
-                <a href="#" className="text-gray-900 hover:text-black">
+                <Link to="/terms" className="text-blue-600 hover:text-blue-700 font-medium">
                   Terms of Service
-                </a>{" "}
+                </Link>{" "}
                 and{" "}
-                <a href="#" className="text-gray-900 hover:text-black">
+                <Link to="/privacy" className="text-blue-600 hover:text-blue-700 font-medium">
                   Privacy Policy
-                </a>
+                </Link>
               </label>
             </div>
 

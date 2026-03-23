@@ -45,7 +45,7 @@ export default function AdminProperties() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -68,17 +68,6 @@ export default function AdminProperties() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Under Review</p>
-                <p className="text-2xl font-semibold text-gray-900">{data.stats.underReview}</p>
-              </div>
-              <Home className="h-8 w-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Properties Grid */}
@@ -89,7 +78,7 @@ export default function AdminProperties() {
               className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 relative bg-cover bg-center"
               style={property.image ? { backgroundImage: `url(${property.image})` } : {}}
             >
-              <Badge className="absolute top-3 right-3 bg-white text-gray-900">
+              <Badge variant="secondary" className="absolute top-3 right-3 bg-white text-gray-900 shadow-sm">
                 {property.status}
               </Badge>
             </div>
