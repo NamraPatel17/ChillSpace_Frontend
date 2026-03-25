@@ -1,5 +1,5 @@
-import { DollarSign, TrendingUp, Download, Calendar } from "lucide-react";
-import { useState, useEffect } from "react";
+import { DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 export default function HostEarnings() {
@@ -14,6 +14,7 @@ export default function HostEarnings() {
     averagePerBooking: 0
   });
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState("all"); // "all" | "thisMonth" | "last3" | "last6"
 
   useEffect(() => {
     const fetchEarnings = async () => {
@@ -22,7 +23,6 @@ export default function HostEarnings() {
         const res = await axios.get("/hosts/earnings", {
           headers: { Authorization: `Bearer ${token}` }
         });
-        
         setEarningsData(res.data.earningsChart || []);
         setTransactions(res.data.transactions || []);
         setStats({
@@ -39,32 +39,50 @@ export default function HostEarnings() {
         setLoading(false);
       }
     };
-
     fetchEarnings();
   }, []);
 
-  const maxAmount = earningsData.length > 0 
-    ? Math.max(...earningsData.map((d) => d.amount)) 
-    : 100; // default fallback to prevent NuN layout shifts
+  // Filter transactions based on selected period
+  const filteredTransactions = useMemo(() => {
+    if (period === "all") return transactions;
+    const now = new Date();
+    const msMap = { thisMonth: 30, last3: 90, last6: 180 };
+    const days = msMap[period] || 0;
+    const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    return transactions.filter(t => {
+      const d = new Date(t.date || t.createdAt);
+      return d >= cutoff;
+    });
+  }, [transactions, period]);
 
-  if (loading) {
-    return <div className="p-6">Loading earnings data...</div>;
-  }
+  // Filter chart bars
+  const filteredChart = useMemo(() => {
+    if (period === "all") return earningsData;
+    const now = new Date();
+    const monthsMap = { thisMonth: 1, last3: 3, last6: 6 };
+    const months = monthsMap[period] || earningsData.length;
+    return earningsData.slice(-months);
+  }, [earningsData, period]);
+
+  const maxAmount = filteredChart.length > 0
+    ? Math.max(...filteredChart.map(d => d.amount))
+    : 100;
+
+  if (loading) return <div className="p-6">Loading earnings data...</div>;
+
+  const periods = [
+    { key: "all", label: "All Time" },
+    { key: "thisMonth", label: "This Month" },
+    { key: "last3", label: "Last 3 Months" },
+    { key: "last6", label: "Last 6 Months" },
+  ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Earnings</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Track your income and payouts
-          </p>
-        </div>
-        <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 border">
-          <Download className="h-4 w-4 mr-2" />
-          Export Report
-        </button>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Earnings</h1>
+        <p className="mt-1 text-sm text-gray-600">Track your income and payouts</p>
       </div>
 
       {/* Stats */}
@@ -73,9 +91,7 @@ export default function HostEarnings() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Earnings</p>
-              <p className="mt-2 text-3xl font-semibold text-gray-900">
-                ${stats.totalEarnings.toLocaleString()}
-              </p>
+              <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.totalEarnings.toLocaleString()}</p>
               <p className="mt-2 text-sm text-green-600 flex items-center">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 Lifetime total
@@ -90,13 +106,13 @@ export default function HostEarnings() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">This Month</p>
           <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.thisMonthEarnings.toLocaleString()}</p>
-          <p className="mt-2 text-sm text-gray-600">{stats.thisMonthBookingsCount} bookings</p>
+          <p className="mt-2 text-sm text-indigo-600">{stats.thisMonthBookingsCount} bookings</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">Pending Payouts</p>
           <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.pendingPayouts.toLocaleString()}</p>
-          <p className="mt-2 text-sm text-gray-600">{stats.pendingCount} transactions</p>
+          <p className="mt-2 text-sm text-amber-600">{stats.pendingCount} transactions</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -109,31 +125,35 @@ export default function HostEarnings() {
       {/* Earnings Chart */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Monthly Earnings
-          </h2>
-          <div className="flex items-center space-x-2">
-            <button className="inline-flex flex-row py-1 px-3 border rounded text-sm items-center hover:bg-gray-50">
-              <Calendar className="h-4 w-4 mr-2" />
-              Recent
-            </button>
+          <h2 className="text-lg font-semibold text-gray-900">Monthly Earnings</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            {periods.map(p => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`inline-flex items-center py-1 px-3 border rounded text-sm transition-colors ${
+                  period === p.key
+                    ? "bg-indigo-600 text-white border-indigo-600"
+                    : "hover:bg-gray-50 text-gray-600 border-gray-300"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Simple Bar Chart */}
         <div className="flex items-end justify-between h-64 gap-4">
-          {earningsData.length === 0 ? (
-            <div className="w-full text-center text-gray-500 py-10">No earnings data available yet.</div>
-          ) : earningsData.map((data) => (
+          {filteredChart.length === 0 ? (
+            <div className="w-full text-center text-gray-500 py-10">No earnings data for this period.</div>
+          ) : filteredChart.map((data) => (
             <div key={data.month} className="flex-1 flex flex-col items-center">
               <div className="w-full bg-gray-100 rounded-t-lg relative group">
                 <div
-                  className="w-full bg-gray-900 rounded-t-lg transition-all hover:bg-black"
-                  style={{
-                    height: `${(data.amount / maxAmount) * 200}px`,
-                  }}
+                  className="w-full bg-indigo-600 rounded-t-lg transition-all hover:bg-indigo-700"
+                  style={{ height: `${(data.amount / maxAmount) * 200}px` }}
                 >
-                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded z-10">
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded z-10 whitespace-nowrap">
                     ${data.amount.toLocaleString()}
                   </div>
                 </div>
@@ -146,67 +166,39 @@ export default function HostEarnings() {
 
       {/* Recent Transactions */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
-            Recent Transactions
+            Recent Transactions {period !== "all" && <span className="text-sm font-normal text-gray-500 ml-2">({periods.find(p => p.key === period)?.label})</span>}
           </h2>
+          <span className="text-sm text-gray-500">{filteredTransactions.length} record{filteredTransactions.length !== 1 ? "s" : ""}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Transaction ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Property
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Guest
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
+                {["Transaction ID", "Date", "Property", "Guest", "Amount", "Status"].map(h => (
+                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {transactions.length === 0 ? (
+              {filteredTransactions.length === 0 ? (
                 <tr>
-                   <td colSpan="6" className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">
-                     No transactions found.
-                   </td>
+                  <td colSpan="6" className="px-6 py-8 text-sm text-center text-gray-500">No transactions found for this period.</td>
                 </tr>
-              ) : transactions.map((transaction) => (
+              ) : filteredTransactions.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {transaction.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {transaction.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {transaction.property}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {transaction.guest}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {transaction.amount}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.date}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.property}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.guest}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.amount}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        transaction.status === "Completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      transaction.status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-amber-100 text-amber-800"
+                    }`}>
                       {transaction.status}
                     </span>
                   </td>

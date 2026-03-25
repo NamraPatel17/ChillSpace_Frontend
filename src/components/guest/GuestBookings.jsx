@@ -19,6 +19,29 @@ export default function GuestBookings() {
   const [bookings, setBookings] = useState({ upcoming: [], past: [], cancelled: [] });
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/bookings/${bookingId}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Move booking from upcoming to cancelled in local state
+      setBookings(prev => {
+        const cancelled = prev.upcoming.find(b => b.id === bookingId);
+        if (!cancelled) return prev;
+        const updated = { ...cancelled, status: "cancelled" };
+        return {
+          ...prev,
+          upcoming: prev.upcoming.filter(b => b.id !== bookingId),
+          cancelled: [updated, ...prev.cancelled]
+        };
+      });
+    } catch (err) {
+      alert("Failed to cancel booking. Please try again.");
+    }
+  };
+
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -201,7 +224,7 @@ export default function GuestBookings() {
                           <Button variant="outline" className="w-full font-semibold px-6 border-gray-300 hover:bg-gray-50">View Property</Button>
                         </Link>
                         {activeTab === "upcoming" && (
-                          <Button variant="destructive" className="w-full sm:w-auto font-semibold px-6">Cancel Booking</Button>
+                          <Button variant="destructive" className="w-full sm:w-auto font-semibold px-6" onClick={() => handleCancelBooking(booking.id)}>Cancel Booking</Button>
                         )}
                         {activeTab === "past" && !booking.reviewSubmitted && (
                           <Button className="w-full sm:w-auto bg-gray-900 hover:black text-black font-semibold px-6">Write Review</Button>

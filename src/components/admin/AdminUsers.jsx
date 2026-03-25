@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Search, MoreVertical, UserCheck, UserX } from "lucide-react";
+import { Label } from "../../components/ui/label";
+import { Search, MoreVertical, UserCheck, UserX, X } from "lucide-react";
 import axios from "axios";
 
 export default function AdminUsers() {
@@ -14,6 +15,45 @@ export default function AdminUsers() {
   });
   const [loading, setLoading] = useState(true);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ fullName: "", email: "", password: "", role: "Guest" });
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState(null);
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      setAddLoading(true);
+      setAddError(null);
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.post("/users/register", addForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Append new user to the list optimistically
+      const newUser = {
+        id: res.data.data?._id || Date.now(),
+        name: addForm.fullName,
+        email: addForm.email,
+        role: addForm.role,
+        verified: false,
+        status: "Active",
+        bookings: 0,
+        properties: 0,
+        joined: new Date().toLocaleDateString()
+      };
+      setData(prev => ({
+        ...prev,
+        users: [newUser, ...prev.users],
+        stats: { ...prev.stats, total: prev.stats.total + 1 }
+      }));
+      setShowAddModal(false);
+      setAddForm({ fullName: "", email: "", password: "", role: "Guest" });
+    } catch (err) {
+      setAddError(err.response?.data?.message || "Failed to create user.");
+    } finally {
+      setAddLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -164,9 +204,48 @@ export default function AdminUsers() {
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Button>Add New User</Button>
+          <Button onClick={() => setShowAddModal(true)}>Add New User</Button>
         </div>
       </div>
+
+      {/* Add User Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Add New User</h3>
+              <button onClick={() => { setShowAddModal(false); setAddError(null); }} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></button>
+            </div>
+            {addError && <p className="text-sm text-red-600 mb-3 bg-red-50 p-2 rounded">{addError}</p>}
+            <form onSubmit={handleAddUser} className="space-y-4">
+              <div className="space-y-1">
+                <Label htmlFor="addFullName">Full Name</Label>
+                <Input id="addFullName" required value={addForm.fullName} onChange={e => setAddForm(p => ({...p, fullName: e.target.value}))} placeholder="Jane Doe" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="addEmail">Email</Label>
+                <Input id="addEmail" type="email" required value={addForm.email} onChange={e => setAddForm(p => ({...p, email: e.target.value}))} placeholder="jane@example.com" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="addPassword">Password</Label>
+                <Input id="addPassword" type="password" required value={addForm.password} onChange={e => setAddForm(p => ({...p, password: e.target.value}))} placeholder="Min. 6 characters" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="addRole">Role</Label>
+                <select id="addRole" value={addForm.role} onChange={e => setAddForm(p => ({...p, role: e.target.value}))} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                  <option value="Guest">Guest</option>
+                  <option value="Host">Host</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" className="flex-1" onClick={() => { setShowAddModal(false); setAddError(null); }}>Cancel</Button>
+                <Button type="submit" className="flex-1" disabled={addLoading}>{addLoading ? "Creating..." : "Create User"}</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

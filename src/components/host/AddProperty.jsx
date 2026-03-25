@@ -19,6 +19,9 @@ export default function AddProperty() {
     propertyType: "",
     maxGuests: 1,
     description: "",
+    street: "",
+    city: "",
+    country: "",
     location: "",
     pricePerNight: "",
     amenities: []
@@ -98,7 +101,12 @@ export default function AddProperty() {
       payload.append("propertyType", formData.propertyType);
       payload.append("maxGuests", formData.maxGuests);
       payload.append("description", formData.description);
-      payload.append("location", formData.location);
+      payload.append("street", formData.street);
+      payload.append("city", formData.city);
+      payload.append("country", formData.country);
+      // Combine into location string for search/display compatibility
+      const combinedLocation = [formData.city, formData.country].filter(Boolean).join(", ");
+      payload.append("location", combinedLocation || formData.city);
       payload.append("pricePerNight", formData.pricePerNight);
       
       // Append amenities array
@@ -163,9 +171,9 @@ export default function AddProperty() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
                     currentStep > step.number
-                      ? "bg-gray-800 border-green-500"
+                      ? "bg-green-600 border-green-600"
                       : currentStep === step.number
-                      ? "bg-gray-900 border-gray-900"
+                      ? "bg-indigo-600 border-indigo-600"
                       : "bg-white border-gray-300"
                   }`}
                 >
@@ -176,7 +184,7 @@ export default function AddProperty() {
                       className={`text-sm font-semibold ${
                         currentStep === step.number
                           ? "text-white"
-                          : "text-gray-500"
+                          : "text-gray-400"
                       }`}
                     >
                       {step.number}
@@ -186,8 +194,10 @@ export default function AddProperty() {
                 <div className="mt-2 text-center hidden sm:block">
                   <p
                     className={`text-sm font-medium ${
-                      currentStep >= step.number
-                        ? "text-gray-900"
+                      currentStep > step.number
+                        ? "text-green-600"
+                        : currentStep === step.number
+                        ? "text-indigo-600"
                         : "text-gray-500"
                     }`}
                   >
@@ -199,7 +209,7 @@ export default function AddProperty() {
               {index < steps.length - 1 && (
                 <div
                   className={`h-0.5 flex-1 mx-2 min-w-[30px] ${
-                    currentStep > step.number ? "bg-gray-800" : "bg-gray-300"
+                    currentStep > step.number ? "bg-green-500" : "bg-gray-200"
                   }`}
                 ></div>
               )}
@@ -272,28 +282,42 @@ export default function AddProperty() {
               </h2>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">City / General Location *</Label>
+                  <Label htmlFor="street">Street Address / Area *</Label>
                   <Input
-                    id="location"
+                    id="street"
                     type="text"
                     onChange={handleInputChange}
-                    value={formData.location}
-                    placeholder="e.g., Miami, FL"
+                    value={formData.street}
+                    placeholder="e.g., 123 Ocean Drive, Beachfront"
                   />
-                  <p className="text-xs text-gray-500">
-                    Enter the city and state or region of the property.
-                  </p>
                 </div>
 
-                {/* Map Placeholder */}
-                <div className="mt-6">
-                  <Label>Property Location on Map</Label>
-                  <div className="mt-2 bg-gray-100 rounded-lg h-64 flex items-center justify-center border-2 border-dashed border-gray-300">
-                    <div className="text-center">
-                      <p className="text-gray-500">Map preview automatically centered at {formData.location || "Location"}</p>
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City *</Label>
+                    <Input
+                      id="city"
+                      type="text"
+                      onChange={handleInputChange}
+                      value={formData.city}
+                      placeholder="e.g., Miami"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country *</Label>
+                    <Input
+                      id="country"
+                      type="text"
+                      onChange={handleInputChange}
+                      value={formData.country}
+                      placeholder="e.g., United States"
+                    />
                   </div>
                 </div>
+
+                <p className="text-xs text-gray-500">
+                  Your full address is used to describe the property to guests.
+                </p>
               </div>
             </div>
           </div>

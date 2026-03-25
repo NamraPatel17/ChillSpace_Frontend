@@ -34,6 +34,7 @@ import HostBookings from "../components/host/HostBookings";
 import HostEarnings from "../components/host/HostEarnings";
 import HostProperties from "../components/host/HostProperties";
 import AddProperty from "../components/host/AddProperty";
+import EditProperty from "../components/host/EditProperty";
 import HostSettings from "../components/host/HostSettings";
 import HostReviews from "../components/host/HostReviews";
 import HostMessages from "../components/host/HostMessages";
@@ -147,6 +148,10 @@ const router = createBrowserRouter([
       {
         path: "properties/add",
         element: <AddProperty />
+      },
+      {
+        path: "properties/edit/:id",
+        element: <EditProperty />
       },
       {
         path: "bookings",

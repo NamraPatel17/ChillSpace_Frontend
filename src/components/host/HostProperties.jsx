@@ -1,11 +1,25 @@
-import { Plus, MapPin, Eye, Edit, Trash2, MoreVertical } from "lucide-react";
+import { Plus, MapPin, Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function HostProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  const handleDelete = async (propertyId, propertyName) => {
+    if (!window.confirm(`Are you sure you want to delete "${propertyName}"? This cannot be undone.`)) return;
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.delete(`/properties/${propertyId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProperties(prev => prev.filter(p => p.id !== propertyId));
+    } catch (err) {
+      alert("Failed to delete property. Please try again.");
+    }
+  };
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -40,7 +54,7 @@ export default function HostProperties() {
             Manage your vacation rental listings
           </p>
         </div>
-        <Link to="/host/properties/add" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 bg-gray-900 text-white hover:bg-black">
+        <Link to="/host/properties/add" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-indigo-600 text-white hover:bg-indigo-700 h-10 px-4 py-2 shadow-sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Property
         </Link>
@@ -87,9 +101,6 @@ export default function HostProperties() {
                     {property.location}
                   </div>
                 </div>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <MoreVertical className="h-5 w-5" />
-                </button>
               </div>
 
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
@@ -106,32 +117,26 @@ export default function HostProperties() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-gray-200">
                 <div>
                   <p className="text-xs text-gray-600">Bookings</p>
-                  <p className="font-semibold text-gray-900">
-                    {property.bookings}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-600">Views</p>
-                  <p className="font-semibold text-gray-900">
-                    {property.views}
-                  </p>
+                  <p className="font-semibold text-gray-900">{property.bookings}</p>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                <button className="flex items-center justify-center px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </button>
-                <button className="flex items-center justify-center px-3 py-2 text-sm text-gray-900 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <button
+                  onClick={() => navigate(`/host/properties/edit/${property.id}`)}
+                  className="flex items-center justify-center px-3 py-2 text-sm text-gray-900 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
                   <Edit className="h-4 w-4 mr-1" />
                   Edit
                 </button>
-                <button className="flex items-center justify-center px-3 py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                <button
+                  onClick={() => handleDelete(property.id, property.name)}
+                  className="flex items-center justify-center px-3 py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                >
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete
                 </button>

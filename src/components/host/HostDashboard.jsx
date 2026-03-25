@@ -25,28 +25,28 @@ export default function HostDashboard() {
             value: `$${res.data.totalEarnings || 0}`,
             change: "from completed bookings",
             icon: DollarSign,
-            color: "bg-gray-800",
+            color: "bg-green-600",
           },
           {
             name: "Active Properties",
             value: res.data.totalProperties || 0,
             change: "managed by you",
             icon: Home,
-            color: "bg-gray-800",
+            color: "bg-indigo-600",
           },
           {
             name: "Bookings",
             value: res.data.totalBookings || 0,
             change: "across all time",
             icon: Calendar,
-            color: "bg-gray-600",
+            color: "bg-amber-500",
           },
           {
             name: "Confirmed",
             value: res.data.statusBreakdown?.Confirmed || 0,
             change: "ready for check-in",
             icon: TrendingUp,
-            color: "bg-gray-700",
+            color: "bg-sky-500",
           },
         ]);
         
@@ -69,10 +69,10 @@ export default function HostDashboard() {
 
   // Fallback if stats failed to load completely
   const metricsToRender = stats || [
-    { name: "Total Earnings", value: "$0", change: "", icon: DollarSign, color: "bg-gray-800" },
-    { name: "Active Properties", value: "0", change: "", icon: Home, color: "bg-gray-800" },
-    { name: "Bookings", value: "0", change: "", icon: Calendar, color: "bg-gray-600" },
-    { name: "Confirmed", value: "0", change: "", icon: TrendingUp, color: "bg-gray-700" },
+    { name: "Total Earnings", value: "$0", change: "", icon: DollarSign, color: "bg-green-600" },
+    { name: "Active Properties", value: "0", change: "", icon: Home, color: "bg-indigo-600" },
+    { name: "Bookings", value: "0", change: "", icon: Calendar, color: "bg-amber-500" },
+    { name: "Confirmed", value: "0", change: "", icon: TrendingUp, color: "bg-sky-500" },
   ];
 
   return (
@@ -163,7 +163,7 @@ export default function HostDashboard() {
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link to="/host/properties/add" className="block text-center px-4 py-3 bg-gray-900 text-white rounded-lg hover:bg-black transition-colors">
+          <Link to="/host/properties/add" className="block text-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
             Add New Property
           </Link>
 

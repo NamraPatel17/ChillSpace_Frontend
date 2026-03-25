@@ -22,6 +22,12 @@ export default function HostSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("Profile");
+  const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -76,10 +82,10 @@ export default function HostSettings() {
       await axios.put("/users/profile", profile, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert("Settings saved successfully!");
+      showToast("success", "Settings saved successfully!");
     } catch (error) {
       console.error("Failed to save profile settings", error);
-      alert("Failed to save settings. Please try again.");
+      showToast("error", "Failed to save settings. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -96,6 +102,15 @@ export default function HostSettings() {
 
   return (
     <div className="space-y-6">
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
+          toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+        }`}>
+          {toast.message}
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
