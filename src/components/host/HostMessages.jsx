@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Send } from "lucide-react";
+import { Search, Send, ChevronLeft } from "lucide-react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import axios from "axios";
@@ -11,6 +11,7 @@ export default function HostMessages() {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [search, setSearch] = useState("");
+  const [showThreadOnMobile, setShowThreadOnMobile] = useState(false);
   const [loadingConvs, setLoadingConvs] = useState(true);
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const messagesEndRef = useRef(null);
@@ -65,6 +66,7 @@ export default function HostMessages() {
   const handleSelect = (conv) => {
     setSelectedId(conv.id);
     setSelectedConv(conv);
+    setShowThreadOnMobile(true);
   };
 
   const handleSend = async () => {
@@ -101,7 +103,7 @@ export default function HostMessages() {
         <div className="flex h-full">
 
           {/* ── Sidebar ────────────────────────────────────────────────────── */}
-          <div className="w-80 border-r border-gray-200 flex flex-col">
+          <div className={`${showThreadOnMobile ? 'hidden md:flex' : 'flex'} w-full md:w-80 border-r border-gray-200 flex flex-col h-full bg-white`}>
             <div className="p-4 border-b border-gray-200">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -150,7 +152,7 @@ export default function HostMessages() {
           </div>
 
           {/* ── Thread ─────────────────────────────────────────────────────── */}
-          <div className="flex-1 flex flex-col">
+          <div className={`${showThreadOnMobile ? 'flex' : 'hidden md:flex'} flex-1 flex flex-col`}>
             {!selectedId ? (
               <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
                 Select a conversation to start messaging
@@ -160,6 +162,14 @@ export default function HostMessages() {
                 {/* Header */}
                 <div className="p-4 border-b border-gray-200 bg-white">
                   <div className="flex items-center gap-3">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="md:hidden mr-1"
+                      onClick={() => setShowThreadOnMobile(false)}
+                    >
+                      <ChevronLeft className="h-5 w-5 text-gray-400" />
+                    </Button>
                     <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
                       <span className="font-semibold text-indigo-700 text-sm">
                         {selectedConv?.avatar || getInitials(selectedConv?.host)}

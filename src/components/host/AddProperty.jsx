@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Checkbox } from "../../components/ui/checkbox";
 import { CustomSelect } from "../../components/ui/custom-select";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function AddProperty() {
   const navigate = useNavigate();
@@ -15,16 +16,12 @@ export default function AddProperty() {
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
-    title: "",
-    propertyType: "",
-    maxGuests: 1,
-    description: "",
-    street: "",
-    city: "",
-    country: "",
-    location: "",
     pricePerNight: "",
-    amenities: []
+    amenities: [],
+    houseRules: "",
+    checkInTime: "3:00 PM",
+    checkOutTime: "11:00 AM",
+    cancellationPolicy: "Flexible - Full refund 24h prior to arrival"
   });
 
   // Track raw File objects for upload
@@ -37,6 +34,7 @@ export default function AddProperty() {
     { number: 3, title: "Amenities", description: "Features & facilities" },
     { number: 4, title: "Photos", description: "Property images" },
     { number: 5, title: "Pricing", description: "Rates & availability" },
+    { number: 6, title: "Policies", description: "Rules & times" },
   ];
 
   // Adjusted to match Mongoose enum exactly
@@ -73,7 +71,7 @@ export default function AddProperty() {
     if (files) {
       const newFiles = Array.from(files).filter(f => f.type.startsWith("image/"));
       if (imageFiles.length + newFiles.length > 5) {
-        alert("Maximum 5 images allowed");
+        toast.warning("Maximum 5 images allowed");
         return;
       }
       // Create preview URLs
@@ -86,6 +84,25 @@ export default function AddProperty() {
 
   const removeImage = (index) => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const isStepValid = (step) => {
+     switch(step) {
+        case 1:
+           return formData.title?.trim() && formData.propertyType && formData.maxGuests > 0 && formData.description?.trim();
+        case 2:
+           return formData.street?.trim() && formData.city?.trim() && formData.country?.trim();
+        case 3:
+           return true; // Amenities optional? Let's say yes.
+        case 4:
+           return imageFiles.length > 0;
+        case 5:
+           return formData.pricePerNight > 0;
+        case 6:
+           return true; // Policies have defaults
+        default:
+           return true;
+     }
   };
 
   const publishProperty = async () => {
@@ -107,10 +124,14 @@ export default function AddProperty() {
       // Combine into location string for search/display compatibility
       const combinedLocation = [formData.city, formData.country].filter(Boolean).join(", ");
       payload.append("location", combinedLocation || formData.city);
-      payload.append("pricePerNight", formData.pricePerNight);
-      
       // Append amenities array
       formData.amenities.forEach(a => payload.append("amenities", a));
+
+      // New fields
+      payload.append("houseRules", formData.houseRules);
+      payload.append("checkInTime", formData.checkInTime);
+      payload.append("checkOutTime", formData.checkOutTime);
+      payload.append("cancellationPolicy", formData.cancellationPolicy);
       
       // Append images efficiently
       imageFiles.forEach(file => {
@@ -467,6 +488,50 @@ export default function AddProperty() {
           </div>
         )}
 
+        {/* Step 6: Policies */}
+        {currentStep === 6 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                House Rules & Policies
+              </h2>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="checkInTime">Check-in Time</Label>
+                    <Input id="checkInTime" type="text" onChange={handleInputChange} value={formData.checkInTime} placeholder="3:00 PM" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="checkOutTime">Check-out Time</Label>
+                    <Input id="checkOutTime" type="text" onChange={handleInputChange} value={formData.checkOutTime} placeholder="11:00 AM" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
+                  <CustomSelect 
+                    options={["Flexible", "Moderate", "Strict"]} 
+                    value={formData.cancellationPolicy}
+                    onChange={(val) => setFormData(prev => ({...prev, cancellationPolicy: val}))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="houseRules">House Rules</Label>
+                  <textarea
+                    id="houseRules"
+                    rows={4}
+                    onChange={handleInputChange}
+                    value={formData.houseRules}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    placeholder="e.g. No smoking, No pets, etc (New line for each rule)"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-8">
           <Button
@@ -477,9 +542,14 @@ export default function AddProperty() {
             Previous
           </Button>
           <div className="flex items-center space-x-3">
-            {currentStep < 5 ? (
+            {currentStep < 6 ? (
               <Button
-                onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
+                onClick={() => {
+                   if (isStepValid(currentStep)) {
+                      setCurrentStep(Math.min(6, currentStep + 1));
+                   }
+                }}
+                disabled={!isStepValid(currentStep)}
               >
                 Next Step
               </Button>

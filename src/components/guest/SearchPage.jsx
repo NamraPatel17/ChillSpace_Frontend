@@ -10,6 +10,7 @@ import { Slider } from "../ui/slider";
 import { DatePicker } from "../ui/datepicker";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { CustomSelect } from "../ui/custom-select";
 
 export default function SearchPage() {
   const [viewMode, setViewMode] = useState("grid");
@@ -154,15 +155,15 @@ export default function SearchPage() {
 
               {/* Guests */}
               <div className="mb-6">
-                <Label className="mb-3 block">Guests</Label>
-                <input
-                  type="number"
-                  min="1"
-                  max="20"
-                  placeholder="Number of guests"
+                <Label className="mb-3 block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Guests</Label>
+                <CustomSelect
+                  options={Array.from({ length: 15 }, (_, i) => ({ 
+                    label: `${i + 1} ${i === 0 ? 'Guest' : 'Guests'}`, 
+                    value: (i + 1).toString() 
+                  }))}
                   value={searchGuests}
-                  onChange={(e) => setSearchGuests(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-900"
+                  onChange={setSearchGuests}
+                  placeholder="Any guests"
                 />
               </div>
 
@@ -267,45 +268,12 @@ export default function SearchPage() {
               </p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <div 
-                className="relative" 
-                tabIndex={-1} 
-                onBlur={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget)) {
-                    setIsSortOpen(false);
-                  }
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="flex items-center justify-between w-36 sm:w-48 rounded-lg border border-gray-300 bg-white px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors shadow-sm"
-                >
-                  <span className="truncate font-medium text-left flex-1">{sortBy}</span>
-                  <ChevronDown className="h-4 w-4 text-gray-500 ml-1 sm:ml-2 flex-shrink-0" />
-                </button>
-                
-                {isSortOpen && (
-                  <div className="absolute right-0 z-50 mt-1 w-40 sm:w-48 rounded-lg border border-gray-200 bg-white shadow-lg py-1 overflow-hidden pointer-events-auto">
-                    {sortOptions.map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => {
-                          setSortBy(option);
-                          setIsSortOpen(false);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                          sortBy === option 
-                            ? "bg-gray-100 font-semibold text-gray-900 border-l-2 border-gray-900" 
-                            : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-l-2 border-transparent"
-                        }`}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <CustomSelect
+                options={sortOptions}
+                value={sortBy}
+                onChange={setSortBy}
+                className="w-36 sm:w-48"
+              />
               <div className="hidden sm:flex border border-gray-300 rounded-lg overflow-hidden bg-white">
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}

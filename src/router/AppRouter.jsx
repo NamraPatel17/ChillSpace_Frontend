@@ -39,6 +39,7 @@ import HostSettings from "../components/host/HostSettings";
 import HostReviews from "../components/host/HostReviews";
 import HostMessages from "../components/host/HostMessages";
 import ProtectedRoute from "../components/ProtectedRoute";
+import HostAvailability from "../components/host/HostAvailability";
 
 const router = createBrowserRouter([
 
@@ -156,6 +157,10 @@ const router = createBrowserRouter([
       {
         path: "bookings",
         element: <HostBookings />
+      },
+      {
+        path: "calendar",
+        element: <HostAvailability />
       },
 
       {

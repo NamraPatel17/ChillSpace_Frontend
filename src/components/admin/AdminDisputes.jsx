@@ -1,10 +1,12 @@
-import { MessageSquare, Clock, CheckCircle, AlertCircle, ChevronDown } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle, AlertCircle, ChevronDown, CheckSquare, Search, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { CustomSelect } from "../../components/ui/custom-select";
+import { toast } from "react-toastify";
+import { CustomDropdown } from "../../components/ui/CustomDropdown";
 
 const statusConfig = {
   pending: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -27,7 +29,7 @@ export default function AdminDisputes() {
     const fetchDisputes = async () => {
       try {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-        const res = await axios.get("/admin/disputes", {
+        const res = await axios.get(`/disputes/admin?status=${statusFilter}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data) {
@@ -40,7 +42,24 @@ export default function AdminDisputes() {
       }
     };
     fetchDisputes();
-  }, []);
+  }, [statusFilter]);
+
+  const updateDisputeStatus = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/disputes/admin/${id}`, { status: newStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Refresh list
+      const res = await axios.get(`/disputes/admin?status=${statusFilter}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setData(res.data);
+      toast.success("Dispute status updated");
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
 
   if (loading) return <div className="p-6">Loading disputes...</div>;
 
@@ -130,7 +149,7 @@ export default function AdminDisputes() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm font-medium text-gray-900">
-                          {dispute.id}
+                          ID: {dispute.id.slice(-6)}
                         </span>
                         <Badge
                           className={StateObj.color}
@@ -149,22 +168,35 @@ export default function AdminDisputes() {
                         {dispute.description}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span>Guest: {dispute.guest}</span>
+                        <span>By: {dispute.guest} ({dispute.guestEmail})</span>
                         <span>•</span>
-                        <span>Host: {dispute.host}</span>
+                        <span>Against: {dispute.host}</span>
                         <span>•</span>
                         <span>{dispute.property}</span>
                         <span>•</span>
                         <span>{dispute.date}</span>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2 ml-4">
-                      <Button size="sm" variant="outline">
-                        View Details
-                      </Button>
-                      {dispute.status === "pending" && (
-                        <Button size="sm">Take Action</Button>
-                      )}
+                    <div className="flex items-center ml-4">
+                      <CustomDropdown
+                        items={[
+                          ...(dispute.status === "pending" ? [{
+                            label: "Investigate",
+                            icon: Search,
+                            onClick: () => updateDisputeStatus(dispute.id, "in-progress")
+                          }] : []),
+                          ...(dispute.status !== "resolved" ? [{
+                            label: "Resolve Dispute",
+                            icon: CheckSquare,
+                            onClick: () => updateDisputeStatus(dispute.id, "resolved")
+                          }] : []),
+                          {
+                            label: "View Listing",
+                            icon: Eye,
+                            onClick: () => {} // Placeholder
+                          }
+                        ]}
+                      />
                     </div>
                   </div>
                 </div>

@@ -30,6 +30,10 @@ export default function EditProperty() {
     pricePerNight: "",
     amenities: [],
     availabilityStatus: true,
+    houseRules: "",
+    checkInTime: "3:00 PM",
+    checkOutTime: "11:00 AM",
+    cancellationPolicy: "Flexible",
   });
 
   const propertyTypes = ["House", "Apartment", "Villa"];
@@ -61,6 +65,10 @@ export default function EditProperty() {
           pricePerNight: p.pricePerNight || "",
           amenities: p.amenities || [],
           availabilityStatus: p.availabilityStatus !== false,
+          houseRules: Array.isArray(p.houseRules) ? p.houseRules.join("\n") : (p.houseRules || ""),
+          checkInTime: p.checkInTime || "3:00 PM",
+          checkOutTime: p.checkOutTime || "11:00 AM",
+          cancellationPolicy: p.cancellationPolicy || "Flexible",
         });
         setExistingImages(p.images || []);
       } catch (err) {
@@ -317,6 +325,43 @@ export default function EditProperty() {
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, availabilityStatus: !!checked }))}
             />
             <Label htmlFor="availabilityStatus" className="cursor-pointer">Property is available for booking</Label>
+          </div>
+        </div>
+
+        {/* Policies & Rules */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900">Rules & Policies</h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="checkInTime">Check-in Time</Label>
+              <Input id="checkInTime" value={formData.checkInTime} onChange={handleInputChange} placeholder="3:00 PM" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="checkOutTime">Check-out Time</Label>
+              <Input id="checkOutTime" value={formData.checkOutTime} onChange={handleInputChange} placeholder="11:00 AM" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
+            <CustomSelect 
+              options={["Flexible", "Moderate", "Strict"]} 
+              value={formData.cancellationPolicy}
+              onChange={(val) => setFormData(prev => ({...prev, cancellationPolicy: val}))}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="houseRules">House Rules</Label>
+            <textarea
+              id="houseRules"
+              rows={4}
+              value={formData.houseRules}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+              placeholder="e.g. No smoking, No pets, etc. (New line for each rule)"
+            />
           </div>
         </div>
 

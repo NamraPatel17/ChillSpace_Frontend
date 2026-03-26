@@ -10,13 +10,15 @@ import {
   LogOut,
   Menu,
   X,
+  ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 
 const navigation = [
   { name: "Dashboard", href: "/host", icon: LayoutDashboard },
   { name: "My Properties", href: "/host/properties", icon: Home },
-  { name: "Bookings", href: "/host/bookings", icon: Calendar },
+  { name: "Calendar", href: "/host/calendar", icon: Calendar },
+  { name: "Bookings", href: "/host/bookings", icon: ClipboardList },
 
   { name: "Earnings", href: "/host/earnings", icon: DollarSign },
   { name: "Reviews", href: "/host/reviews", icon: Star },

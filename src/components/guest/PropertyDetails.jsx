@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { CustomSelect } from "../ui/custom-select";
 import { DatePicker } from "../ui/datepicker";
+import { AvailabilityCalendar } from "../ui/AvailabilityCalendar";
 
 // Removes dummy reviews block completely
 
@@ -25,17 +26,20 @@ export const PropertyDetails = () => {
   const [loading, setLoading] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [guests, setGuests] = useState();
+  const [availability, setAvailability] = useState({ merged: [] });
 
   const guestId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
 
   const fetchProperty = async () => {
     try {
-      const [propRes, revRes] = await Promise.all([
+      const [propRes, revRes, availRes] = await Promise.all([
         axios.get(`/properties/${id}`),
-        axios.get(`/reviews/property/${id}`)
+        axios.get(`/reviews/property/${id}`),
+        axios.get(`/properties/${id}/availability`)
       ]);
       setProperty(propRes.data);
       setReviews(revRes.data);
+      setAvailability(availRes.data);
     } catch (err) {
       console.log(err);
       toast.error("Failed to load property details");
@@ -73,14 +77,25 @@ export const PropertyDetails = () => {
       return;
     }
 
+    const guestCount = parseInt(guests) || 1;
+    if (guestCount > (property.maxGuests || 10)) {
+       toast.error(`Maximum ${property.maxGuests || 10} guests allowed for this property`);
+       return;
+    }
+
     try {
       setLoading(true);
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      
+      const guestCount = parseInt(guests) || 1;
       const res = await axios.post("/bookings", {
         propertyId: id,
         guestId: guestId,
         checkInDate: checkInDate,
         checkOutDate: checkOutDate,
-        totalPrice: (property.pricePerNight * nights) + 500 // including service fee
+        totalPrice: (property.pricePerNight * nights * guestCount) + 500 // including per-guest pricing + fee
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (res.status === 201) {
@@ -105,7 +120,8 @@ export const PropertyDetails = () => {
   }
 
   const nights = getNights();
-  const basePrice = nights * (property.pricePerNight || 0);
+  const guestCount = parseInt(guests) || 1;
+  const basePrice = nights * (property.pricePerNight || 0) * guestCount;
   const serviceFee = 500; // Static mockup fee
   const totalPrice = basePrice > 0 ? basePrice + serviceFee : 0;
 
@@ -145,13 +161,15 @@ export const PropertyDetails = () => {
   const hostName = property.hostId?.fullName || "Host Member";
   const hostInitial = hostName.charAt(0).toUpperCase();
 
-  const mockHouseRules = [
-    "Check-in: 3:00 PM - 10:00 PM",
-    "Check-out: 11:00 AM",
+  const houseRules = property.houseRules?.length > 0 ? property.houseRules : [
     "No smoking inside",
     "No parties or events",
     "Pets allowed with prior approval"
   ];
+
+  const cancellationPolicy = property.cancellationPolicy || "Flexible - Full refund 24h prior to arrival";
+  const checkInTime = property.checkInTime || "3:00 PM";
+  const checkOutTime = property.checkOutTime || "11:00 AM";
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
@@ -269,17 +287,33 @@ export const PropertyDetails = () => {
 
           <div className="h-[1px] bg-gray-200 w-full" />
 
-          {/* House Rules */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-5 tracking-tight">House Rules</h2>
-            <ul className="space-y-4">
-              {mockHouseRules.map((rule, index) => (
-                <li key={index} className="flex items-center">
-                  <div className="h-1.5 w-1.5 rounded-full bg-gray-900 mr-4" />
-                  <span className="text-gray-700">{rule}</span>
-                </li>
-              ))}
-            </ul>
+          {/* House Rules & Policies */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h2 className="text-2xl font-semibold mb-5 tracking-tight">House Rules</h2>
+              <ul className="space-y-4">
+                {houseRules.map((rule, index) => (
+                  <li key={index} className="flex items-center">
+                    <div className="h-1.5 w-1.5 rounded-full bg-gray-900 mr-4" />
+                    <span className="text-gray-700">{rule}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold mb-5 tracking-tight">Policies</h2>
+              <div className="space-y-4">
+                <div>
+                   <p className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-1">Check-in / Out</p>
+                   <p className="text-gray-700">Check-in: {checkInTime}</p>
+                   <p className="text-gray-700">Check-out: {checkOutTime}</p>
+                </div>
+                <div>
+                   <p className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-1">Cancellation</p>
+                   <p className="text-gray-700 font-medium text-indigo-600">{cancellationPolicy}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="h-[1px] bg-gray-200 w-full" />
@@ -396,33 +430,31 @@ export const PropertyDetails = () => {
               </div>
 
               <div className="space-y-3 mb-6">
-                <DatePicker
-                  value={checkInDate}
-                  onChange={setCheckInDate}
-                  placeholder="Check in"
-                  className="w-full"
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Select Dates</p>
+                <AvailabilityCalendar 
+                  unavailableDates={availability.merged}
+                  onRangeSelect={(start, end) => {
+                    setCheckInDate(start);
+                    setCheckOutDate(end);
+                  }}
+                  initialRange={{
+                    start: checkInDate ? new Date(checkInDate) : null,
+                    end: checkOutDate ? new Date(checkOutDate) : null
+                  }}
                 />
                 
-                <DatePicker
-                  value={checkOutDate}
-                  onChange={setCheckOutDate}
-                  placeholder="Check out"
-                  className="w-full"
-                />
-                
-                <div className="border border-gray-300 rounded-md p-3">
-                  <div className="flex items-center text-sm">
-                    <Users className="h-4 w-4 text-gray-500 mr-2 flex-shrink-0" />
-                    <input
-                      type="number"
-                      min="1"
-                      max={property?.maxGuests || 10}
-                      value={guests || ""}
-                      onChange={(e) => setGuests(e.target.value)}
-                      className="flex-1 text-gray-900 font-medium outline-none bg-transparent cursor-pointer w-full"
-                      placeholder="Guests"
-                    />
-                  </div>
+                <div className="space-y-1.5 px-1 py-1">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Total Guests</p>
+                  <CustomSelect
+                    options={Array.from({ length: property?.maxGuests || 10 }, (_, i) => ({
+                      label: `${i + 1} ${i === 0 ? 'Guest' : 'Guests'}`,
+                      value: (i + 1).toString()
+                    }))}
+                    value={guests}
+                    onChange={(val) => setGuests(val)}
+                    placeholder="Number of guests"
+                    className="border-0 shadow-none"
+                  />
                 </div>
               </div>
 
@@ -443,7 +475,7 @@ export const PropertyDetails = () => {
                   <div className="space-y-3 text-[14px]">
                     <div className="flex justify-between">
                       <span className="text-gray-600 underline">
-                        ${property.pricePerNight} x {nights} nights
+                        ${property.pricePerNight} x {nights} nights x {guestCount} guests
                       </span>
                       <span className="text-gray-900">
                         ${basePrice.toLocaleString()}

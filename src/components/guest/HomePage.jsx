@@ -5,6 +5,7 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { DatePicker } from "../ui/datepicker";
+import { CustomSelect } from "../ui/custom-select";
 import axios from "axios";
 
 export const Home = () => {
@@ -125,20 +126,18 @@ export const Home = () => {
             </div>
 
             {/* Guests Pill */}
-            <div className="flex-[0.8] flex items-center px-6 py-4 bg-[#2a2a2a]/60 hover:bg-[#333333]/80 transition-colors rounded-full w-full">
-              <Users className="h-5 w-5 text-gray-400 mr-3 shrink-0" />
-              <input
-                type="number"
-                min="1"
-                max="20"
-                id="searchGuests"
-                name="searchGuests"
-                autoComplete="off"
-                placeholder="Guests"
+            <div className="flex-[0.8] flex items-center px-4 py-1.5 bg-[#2a2a2a]/60 hover:bg-[#333333]/80 transition-colors rounded-full w-full">
+              <Users className="h-5 w-5 text-gray-400 mr-1 shrink-0 ml-2" />
+              <CustomSelect
+                variant="dark"
+                options={Array.from({ length: 10 }, (_, i) => ({ 
+                  label: `${i + 1} ${i === 0 ? 'Guest' : 'Guests'}`, 
+                  value: (i + 1).toString() 
+                }))}
                 value={searchGuests}
-                onChange={(e) => setSearchGuests(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                className="flex-1 outline-none text-white bg-transparent placeholder-gray-400 text-base [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&:-webkit-autofill]:[transition-delay:9999s] [&:-webkit-autofill]:[-webkit-text-fill-color:white]"
+                onChange={setSearchGuests}
+                placeholder="Guests"
+                className="border-0 shadow-none h-auto"
               />
             </div>
 

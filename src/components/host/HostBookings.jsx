@@ -1,6 +1,9 @@
-import { Search } from "lucide-react";
+import { Search, Star, AlertTriangle, MoreVertical, CheckCircle, XCircle, ShieldCheck } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { CustomSelect } from "../ui/custom-select";
+import { CustomDropdown } from "../ui/CustomDropdown";
 
 export default function HostBookings() {
   const [bookings, setBookings] = useState([]);
@@ -12,23 +15,37 @@ export default function HostBookings() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [period, setPeriod] = useState("all"); // all | 15d | 1m | 3m
 
+  const fetchBookings = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.get("/hosts/bookings", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBookings(res.data.bookings || []);
+      if (res.data.stats) setStats(res.data.stats);
+    } catch (error) {
+      console.error("Failed to fetch host bookings", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-        const res = await axios.get("/hosts/bookings", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setBookings(res.data.bookings || []);
-        if (res.data.stats) setStats(res.data.stats);
-      } catch (error) {
-        console.error("Failed to fetch host bookings", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBookings();
   }, []);
+
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.put(`/bookings/${id}/status`, { bookingStatus: newStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`Booking ${newStatus.toLowerCase()} successfully!`);
+      fetchBookings();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update status");
+    }
+  };
 
   const filteredBookings = useMemo(() => {
     const now = new Date();
@@ -68,6 +85,60 @@ export default function HostBookings() {
     }
   };
 
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewData, setReviewData] = useState({ bookingId: "", rating: 5, reviewText: "" });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [disputeData, setDisputeData] = useState({ bookingId: "", reason: "Property condition", description: "" });
+  const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
+
+  const handleRateGuest = (bookingId) => {
+    setReviewData({ bookingId, rating: 5, reviewText: "" });
+    setIsReviewModalOpen(true);
+  };
+
+  const submitReview = async () => {
+    setIsSubmittingReview(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.post("/reviews/guest", reviewData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Review submitted successfully!");
+      setIsReviewModalOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleRaiseDispute = (bookingId) => {
+    setDisputeData({ bookingId, reason: "Property condition", description: "" });
+    setIsDisputeModalOpen(true);
+  };
+
+  const submitDispute = async () => {
+    if (!disputeData.description.trim()) {
+      toast.warning("Description is required");
+      return;
+    }
+    setIsSubmittingDispute(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.post("/disputes", disputeData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Dispute raised successfully. Support will review it.");
+      setIsDisputeModalOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to raise dispute.");
+    } finally {
+      setIsSubmittingDispute(false);
+    }
+  };
+
   if (loading) return <div className="p-6">Loading host bookings...</div>;
 
   const statuses = ["All", "Confirmed", "Pending", "Cancelled", "Completed"];
@@ -80,12 +151,87 @@ export default function HostBookings() {
 
   return (
     <div className="space-y-6">
+      {/* Rate Guest Modal */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Rate Guest</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
+                <input
+                  type="number" min="1" max="5"
+                  value={reviewData.rating}
+                  onChange={(e) => setReviewData({ ...reviewData, rating: parseInt(e.target.value) })}
+                  className="w-full border rounded p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Review</label>
+                <textarea
+                  value={reviewData.reviewText}
+                  onChange={(e) => setReviewData({ ...reviewData, reviewText: e.target.value })}
+                  rows={4}
+                  className="w-full border rounded p-2"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setIsReviewModalOpen(false)} className="flex-1 px-4 py-2 border rounded">Cancel</button>
+                <button onClick={submitReview} disabled={isSubmittingReview} className="flex-1 bg-indigo-600 text-white rounded">
+                  {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dispute Modal */}
+      {isDisputeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Raise Dispute</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Reason</label>
+                <CustomSelect
+                  options={[
+                    "Property condition",
+                    "Host behaviour",
+                    "Refund issue",
+                    "Safety concern",
+                    "Other"
+                  ]}
+                  value={disputeData.reason}
+                  onChange={(val) => setDisputeData({ ...disputeData, reason: val })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  value={disputeData.description}
+                  onChange={(e) => setDisputeData({ ...disputeData, description: e.target.value })}
+                  rows={4}
+                  className="w-full border rounded p-2"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setIsDisputeModalOpen(false)} className="flex-1 px-4 py-2 border rounded">Cancel</button>
+                <button onClick={submitDispute} disabled={isSubmittingDispute} className="flex-1 bg-red-600 text-white rounded">
+                  {isSubmittingDispute ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">Bookings</h1>
         <p className="mt-1 text-sm text-gray-600">Manage all your property bookings</p>
       </div>
 
-      {/* Filters */}
+      {/* Filters omitted for brevity... */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-3">
         {/* Search */}
         <div className="relative">
@@ -100,7 +246,6 @@ export default function HostBookings() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          {/* Status filter */}
           <div className="flex items-center gap-2 flex-wrap">
             {statuses.map(s => (
               <button
@@ -117,7 +262,6 @@ export default function HostBookings() {
             ))}
           </div>
 
-          {/* Period quick-select */}
           <div className="flex items-center gap-2 flex-wrap ml-auto">
             {periods.map(p => (
               <button
@@ -169,8 +313,8 @@ export default function HostBookings() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {["Booking ID", "Property", "Guest", "Check-in", "Check-out", "Nights", "Amount", "Status"].map(h => (
-                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{h}</th>
+                {["Booking ID", "Property", "Guest", "Check-in", "Check-out", "Amount", "Status", "Actions"].map(h => (
+                  <th key={h} className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${h === "Actions" ? "text-right" : "text-left"}`}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -191,12 +335,48 @@ export default function HostBookings() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.checkIn}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.checkOut}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.nights}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{booking.amount}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
                       {booking.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <CustomDropdown 
+                      items={[
+                        ...(booking.status === "Pending" ? [
+                          {
+                            label: "Confirm Booking",
+                            icon: CheckCircle,
+                            onClick: () => handleUpdateStatus(booking.id, "Confirmed")
+                          },
+                          {
+                            label: "Cancel Booking",
+                            icon: XCircle,
+                            variant: "danger",
+                            onClick: () => handleUpdateStatus(booking.id, "Cancelled")
+                          }
+                        ] : []),
+                        ...(booking.status === "Confirmed" ? [
+                          {
+                            label: "Mark Completed",
+                            icon: ShieldCheck,
+                            onClick: () => handleUpdateStatus(booking.id, "Completed")
+                          }
+                        ] : []),
+                        ...(booking.status === "Completed" ? [{
+                          label: "Rate Guest",
+                          icon: Star,
+                          onClick: () => handleRateGuest(booking.id)
+                        }] : []),
+                        ...(booking.status !== "Cancelled" ? [{
+                          label: "Report Issue",
+                          icon: AlertTriangle,
+                          variant: "danger",
+                          onClick: () => handleRaiseDispute(booking.id)
+                        }] : [])
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}

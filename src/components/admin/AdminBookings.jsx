@@ -1,126 +1,148 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
-import { Calendar, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Calendar, CheckCircle, Clock, XCircle, MoreVertical, Eye, AlertTriangle, ShieldCheck, ShieldAlert, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const getStatusIcon = (status) => {
-  switch (status) {
-    case "Confirmed":
-      return <CheckCircle className="h-4 w-4" />;
-    case "Pending":
-      return <Clock className="h-4 w-4" />;
-    case "Completed":
-      return <CheckCircle className="h-4 w-4" />;
-    case "Cancelled":
-      return <XCircle className="h-4 w-4" />;
-    default:
-      return null;
-  }
-};
+import { CustomDropdown } from "../../components/ui/CustomDropdown";
+import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 
 const getStatusColor = (status) => {
   switch (status) {
     case "Confirmed":
-      return "bg-gray-100 text-blue-800";
+      return "bg-green-100 text-green-800 border-green-200";
     case "Pending":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
     case "Completed":
-      return "bg-green-100 text-green-800";
+      return "bg-blue-100 text-blue-800 border-blue-200";
     case "Cancelled":
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 text-red-800 border-red-200";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 border-gray-200";
+  }
+};
+
+const getStatusIcon = (status) => {
+  switch (status) {
+    case "Confirmed": return <CheckCircle className="h-3 w-3 mr-1" />;
+    case "Pending": return <Clock className="h-3 w-3 mr-1" />;
+    case "Completed": return <CheckCircle className="h-3 w-3 mr-1" />;
+    case "Cancelled": return <XCircle className="h-3 w-3 mr-1" />;
+    default: return null;
   }
 };
 
 export default function AdminBookings() {
-  const [data, setData] = useState({ bookings: [], stats: { total: 0, confirmed: 0, pending: 0, cancelled: 0, completed: 0 } });
+  const [data, setData] = useState({ 
+    bookings: [], 
+    stats: { total: 0, confirmed: 0, pending: 0, cancelled: 0, completed: 0 } 
+  });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  
+  // Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null, loading: false });
+
+  const fetchBookings = async () => {
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.get("/admin/bookings", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data) {
+        setData(res.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load platform bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-        const res = await axios.get("/admin/bookings", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.data) {
-          setData(res.data);
-        }
-      } catch (err) {
-        console.error("Failed to load global bookings", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBookings();
   }, []);
 
-  if (loading) return <div className="p-6">Loading bookings...</div>;
+  const handleUpdateStatus = (id, newStatus) => {
+    
+    const isDestructive = newStatus === "Cancelled";
+    
+    setConfirmModal({
+      isOpen: true,
+      title: `${newStatus} Booking`,
+      message: `Are you sure you want to change this booking status to ${newStatus}?`,
+      loading: false,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, loading: true }));
+        try {
+          const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+          await axios.put(`/admin/bookings/${id}/status`, { status: newStatus }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          toast.success(`Booking ${newStatus.toLowerCase()} successfully`);
+          fetchBookings();
+          setConfirmModal({ isOpen: false, title: "", message: "", onConfirm: null, loading: false });
+        } catch (err) {
+          toast.error(err.response?.data?.message || "Failed to update status");
+          setConfirmModal(prev => ({ ...prev, loading: false }));
+        }
+      }
+    });
+  };
+
+  if (loading) return <div className="p-6">Loading platform bookings...</div>;
 
   return (
     <div className="space-y-6">
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        isLoading={confirmModal.loading}
+        variant={confirmModal.title.toLowerCase().includes("cancel") ? "danger" : "primary"}
+      />
+
       <div>
         <h2 className="text-3xl font-semibold text-gray-900">Booking Management</h2>
         <p className="mt-1 text-sm text-gray-500">
-          Monitor and manage all bookings on the platform
+          Monitor and manage all reservations on the platform
         </p>
       </div>
 
-      {/* Stats */}
+      {/* Stats Section */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Bookings</p>
-                <p className="text-2xl font-semibold text-gray-900">{data.stats.total}</p>
+        {[
+          { label: "Total Bookings", value: data.stats.total, icon: Calendar, color: "text-gray-900" },
+          { label: "Confirmed", value: data.stats.confirmed, icon: CheckCircle, color: "text-green-600" },
+          { label: "Pending", value: data.stats.pending, icon: Clock, color: "text-yellow-600" },
+          { label: "Cancelled", value: data.stats.cancelled, icon: XCircle, color: "text-red-600" },
+        ].map((stat, i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                </div>
+                <stat.icon className={`h-8 w-8 ${stat.color}`} />
               </div>
-              <Calendar className="h-8 w-8 text-gray-900" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Confirmed</p>
-                <p className="text-2xl font-semibold text-gray-900">{data.stats.confirmed}</p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-2xl font-semibold text-gray-900">{data.stats.pending}</p>
-              </div>
-              <Clock className="h-8 w-8 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Cancelled</p>
-                <p className="text-2xl font-semibold text-gray-900">{data.stats.cancelled}</p>
-              </div>
-              <XCircle className="h-8 w-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Bookings Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Bookings</CardTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+             <CardTitle>Global Bookings</CardTitle>
+             <p className="text-xs text-gray-400 font-medium">Click on 3-dots to manage actions</p>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -130,50 +152,60 @@ export default function AdminBookings() {
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Booking ID</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Guest</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Property</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Check-in</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Check-out</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Dates</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Amount</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {data.bookings.length > 0 ? data.bookings.map((booking) => (
-                  <tr key={booking._id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr key={booking._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4">
-                      <span className="text-sm font-medium text-gray-900">{booking._id.substring(booking._id.length - 8).toUpperCase()}</span>
+                      <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">
+                        #{booking._id.substring(booking._id.length - 8).toUpperCase()}
+                      </span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm text-gray-900">{booking.guestId?.fullName || "Unknown"}</span>
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900">{booking.guestId?.fullName || "Private Guest"}</p>
+                        <p className="text-xs text-gray-500">{booking.guestId?.email}</p>
+                      </div>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm text-gray-600">{booking.propertyId?.title || "Unknown"}</span>
+                      <span className="text-sm text-gray-600 line-clamp-1">{booking.propertyId?.title || "Property N/A"}</span>
+                    </td>
+                    <td className="py-4 px-4 text-sm text-gray-600">
+                      <div className="flex flex-col">
+                        <span>{new Date(booking.checkInDate).toLocaleDateString()}</span>
+                        <span className="text-[10px] text-gray-400">to {new Date(booking.checkOutDate).toLocaleDateString()}</span>
+                      </div>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm text-gray-600">{new Date(booking.checkInDate).toLocaleDateString()}</span>
+                      <span className="text-sm font-bold text-gray-900">${booking.totalPrice?.toLocaleString()}</span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm text-gray-600">{new Date(booking.checkOutDate).toLocaleDateString()}</span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className="text-sm font-semibold text-gray-900">${booking.totalPrice}</span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <Badge className={getStatusColor(booking.bookingStatus)}>
-                        <span className="flex items-center gap-1">
+                      <Badge variant="outline" className={`${getStatusColor(booking.bookingStatus)} border-0 shadow-sm`}>
+                        <span className="flex items-center text-[10px] uppercase tracking-wider font-bold">
                           {getStatusIcon(booking.bookingStatus)}
                           {booking.bookingStatus}
                         </span>
                       </Badge>
                     </td>
-                    <td className="py-4 px-4">
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
+                    <td className="py-4 px-4 text-right">
+                      <CustomDropdown 
+                        items={[
+                          {
+                            label: "View Listing",
+                            icon: Eye,
+                            onClick: () => navigate(`/user/properties/${booking.propertyId?._id}`)
+                          }
+                        ]}
+                      />
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="8" className="py-4 px-4 text-center text-gray-500">No bookings found.</td></tr>
+                  <tr><td colSpan="7" className="py-10 text-center text-gray-400">No system bookings found.</td></tr>
                 )}
               </tbody>
             </table>

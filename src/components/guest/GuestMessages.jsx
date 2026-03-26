@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Send, Search, Image as ImageIcon, Paperclip } from "lucide-react";
+import { Send, Search, ChevronLeft } from "lucide-react";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
@@ -13,6 +13,7 @@ export default function GuestMessages() {
   const [messages, setMessages] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messageText, setMessageText] = useState("");
+  const [showThreadOnMobile, setShowThreadOnMobile] = useState(false);
   
   const loggedInUserId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
   const location = useLocation();
@@ -83,6 +84,7 @@ export default function GuestMessages() {
   
   const handleSelectConversation = (conv) => {
       setSelectedConversation(conv);
+      setShowThreadOnMobile(true);
       fetchThread(conv.id);
   }
 
@@ -117,7 +119,7 @@ export default function GuestMessages() {
         <CardContent className="p-0 h-full">
           <div className="flex h-full">
             {/* Conversations List */}
-            <div className="w-full md:w-96 border-r border-gray-200 flex flex-col h-full bg-white">
+            <div className={`${showThreadOnMobile ? 'hidden md:flex' : 'flex'} w-full md:w-96 border-r border-gray-200 flex flex-col h-full bg-white`}>
               <div className="p-4 border-b border-gray-100">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -175,21 +177,31 @@ export default function GuestMessages() {
 
             {/* Message Thread */}
             {selectedConversation ? (
-                <div className="hidden md:flex flex-col flex-1 h-full bg-gray-50">
+                <div className={`${showThreadOnMobile ? 'flex' : 'hidden md:flex'} flex-col flex-1 h-full bg-gray-50`}>
                   {/* Header */}
-                  <div className="p-4 border-b border-gray-100 bg-white flex items-center gap-3 shadow-sm z-10">
-                    <Avatar>
-                      <AvatarFallback>
-                        {selectedConversation.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        {selectedConversation.host}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {selectedConversation.property}
-                      </p>
+                  <div className="p-4 border-b border-gray-100 bg-white flex items-center justify-between shadow-sm z-10">
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="md:hidden mr-1"
+                        onClick={() => setShowThreadOnMobile(false)}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </Button>
+                      <Avatar>
+                        <AvatarFallback>
+                          {selectedConversation.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          {selectedConversation.host}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {selectedConversation.property}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -231,12 +243,6 @@ export default function GuestMessages() {
                   {/* Input Floor */}
                   <div className="p-4 border-t border-gray-200 bg-white">
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
-                        <ImageIcon className="h-5 w-5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
-                        <Paperclip className="h-5 w-5" />
-                      </Button>
                       <Input
                         placeholder="Type a message..."
                         value={messageText}

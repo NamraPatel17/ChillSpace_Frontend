@@ -1,23 +1,33 @@
-import { Plus, MapPin, Edit, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { CustomDropdown } from "../ui/CustomDropdown";
+import { ConfirmationModal } from "../ui/ConfirmationModal";
+import { toast } from "react-toastify";
+import { MoreVertical, Star, MapPin, Trash2, Eye, ShieldAlert, ShieldCheck, Plus, Edit } from "lucide-react";
 
 export default function HostProperties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const handleDelete = async (propertyId, propertyName) => {
-    if (!window.confirm(`Are you sure you want to delete "${propertyName}"? This cannot be undone.`)) return;
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, propertyId: null, propertyName: "" });
+
+  const handleDelete = async () => {
+    const { propertyId } = deleteModal;
+    setLoading(true);
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       await axios.delete(`/properties/${propertyId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProperties(prev => prev.filter(p => p.id !== propertyId));
+      toast.success("Property deleted successfully");
+      setDeleteModal({ isOpen: false, propertyId: null, propertyName: "" });
     } catch (err) {
-      alert("Failed to delete property. Please try again.");
+      toast.error("Failed to delete property");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,6 +56,16 @@ export default function HostProperties() {
 
   return (
     <div className="space-y-6">
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+        onConfirm={handleDelete}
+        title="Delete Property"
+        message={`Are you sure you want to delete "${deleteModal.propertyName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isLoading={loading && deleteModal.isOpen}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -69,7 +89,7 @@ export default function HostProperties() {
         ) : properties.map((property) => (
           <div
             key={property.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+            className="relative bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
           >
             {/* Image */}
             <div className="relative h-48 bg-gray-100">
@@ -93,9 +113,26 @@ export default function HostProperties() {
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 line-clamp-1">
-                    {property.name}
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-900 line-clamp-1">
+                      {property.name}
+                    </h3>
+                    <CustomDropdown
+                      items={[
+                        {
+                          label: "Edit Property",
+                          icon: Edit,
+                          onClick: () => navigate(`/host/properties/edit/${property.id}`)
+                        },
+                        {
+                          label: "Delete Property",
+                          icon: Trash2,
+                          variant: "danger",
+                          onClick: () => setDeleteModal({ isOpen: true, propertyId: property.id, propertyName: property.name })
+                        }
+                      ]}
+                    />
+                  </div>
                   <div className="flex items-center text-sm text-gray-600 mt-1 line-clamp-1">
                     <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
                     {property.location}
@@ -122,24 +159,6 @@ export default function HostProperties() {
                   <p className="text-xs text-gray-600">Bookings</p>
                   <p className="font-semibold text-gray-900">{property.bookings}</p>
                 </div>
-              </div>
-
-              {/* Actions */}
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                <button
-                  onClick={() => navigate(`/host/properties/edit/${property.id}`)}
-                  className="flex items-center justify-center px-3 py-2 text-sm text-gray-900 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(property.id, property.name)}
-                  className="flex items-center justify-center px-3 py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
-                </button>
               </div>
             </div>
           </div>
