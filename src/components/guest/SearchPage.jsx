@@ -324,13 +324,26 @@ export default function SearchPage() {
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="ml-1 text-sm font-medium">
-                            {property.rating || "4.8"}
-                          </span>
-                          <span className="ml-1 text-sm text-gray-500">
-                            ({Math.floor(Math.random() * 100) + 10})
-                          </span>
+                          {property.rating > 0 ? (
+                            <>
+                              <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                              <span className="ml-1 text-sm font-medium">
+                                {Number(property.rating).toFixed(1)}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <Star className="h-4 w-4 text-gray-300" />
+                              <span className="ml-1 text-sm font-medium text-gray-500">
+                                New
+                              </span>
+                            </>
+                          )}
+                          {property.reviewsCount > 0 && (
+                            <span className="ml-1 text-sm text-gray-500">
+                              ({property.reviewsCount} reviews)
+                            </span>
+                          )}
                         </div>
                         <div className="text-right">
                           <span className="text-lg font-semibold text-gray-900">
@@ -384,13 +397,26 @@ export default function SearchPage() {
                           </div>
                           <div className="text-right ml-4">
                             <div className="flex items-center mb-2 justify-end">
-                              <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                              <span className="ml-1 text-sm font-medium">
-                                {property.rating || "4.8"}
-                              </span>
-                              <span className="ml-1 text-sm text-gray-500">
-                                ({Math.floor(Math.random() * 100) + 10})
-                              </span>
+                              {property.rating > 0 ? (
+                                <>
+                                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                                  <span className="ml-1 text-sm font-medium">
+                                    {Number(property.rating).toFixed(1)}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <Star className="h-4 w-4 text-gray-300" />
+                                  <span className="ml-1 text-sm font-medium text-gray-500">
+                                    New
+                                  </span>
+                                </>
+                              )}
+                              {property.reviewsCount > 0 && (
+                                <span className="ml-1 text-sm text-gray-500">
+                                  ({property.reviewsCount} reviews)
+                                </span>
+                              )}
                             </div>
                             <div>
                               <span className="text-2xl font-semibold text-gray-900">

@@ -199,6 +199,12 @@ export default function AdminBookings() {
                             label: "View Listing",
                             icon: Eye,
                             onClick: () => navigate(`/user/properties/${booking.propertyId?._id}`)
+                          },
+                          {
+                            label: "Report User",
+                            icon: AlertTriangle,
+                            variant: "danger",
+                            onClick: () => alert("Report User feature coming soon.") // Stub for future dispute integration
                           }
                         ]}
                       />

@@ -16,6 +16,12 @@ export default function HostSettings() {
       bookings: true,
       reviews: true,
       marketing: false
+    },
+    payoutMethod: {
+      bankName: "",
+      accountName: "",
+      accountNumber: "",
+      routingNumber: ""
     }
   });
 
@@ -44,6 +50,10 @@ export default function HostSettings() {
             notificationPreferences: {
               ...prev.notificationPreferences,
               ...(res.data.notificationPreferences || {})
+            },
+            payoutMethod: {
+              ...prev.payoutMethod,
+              ...(res.data.payoutMethod || {})
             }
           }));
         }
@@ -62,6 +72,17 @@ export default function HostSettings() {
     setProfile(prev => ({
       ...prev,
       [id]: value
+    }));
+  };
+
+  const handlePayoutChange = (e) => {
+    const { id, value } = e.target;
+    setProfile(prev => ({
+      ...prev,
+      payoutMethod: {
+        ...prev.payoutMethod,
+        [id]: value
+      }
     }));
   };
 
@@ -148,10 +169,6 @@ export default function HostSettings() {
               <Shield className="h-5 w-5 mr-3" />
               Security
             </button>
-            <button className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
-              <Globe className="h-5 w-5 mr-3" />
-              Preferences
-            </button>
           </div>
         </div>
 
@@ -173,11 +190,9 @@ export default function HostSettings() {
                     </span>
                   </div>
                   <div>
-                    <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                      Change Photo
-                    </button>
-                    <p className="text-xs text-gray-500 mt-1">
-                      JPG, GIF or PNG. Max size of 800K
+                    <p className="text-sm font-medium text-gray-900 mb-1">{profile.fullName}</p>
+                    <p className="text-xs text-gray-500">
+                      Standard profile avatar
                     </p>
                   </div>
                 </div>
@@ -334,37 +349,80 @@ export default function HostSettings() {
           <div className={activeTab === 'Payout' ? "block" : "hidden"}>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                Payout Information
+                Payout Configuration
               </h2>
-
+              
               <div className="space-y-4">
-                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <CreditCard className="h-6 w-6 text-gray-900" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          Bank Account ****4567
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Primary payout method
-                        </p>
-                      </div>
-                    </div>
-                    <button className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                      Edit
-                    </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="bankName" className="text-sm font-medium leading-none">Bank Name</label>
+                    <input
+                      id="bankName"
+                      type="text"
+                      value={profile.payoutMethod?.bankName || ""}
+                      onChange={handlePayoutChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      placeholder="e.g. Chase Bank"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="accountName" className="text-sm font-medium leading-none">Account Holder Name</label>
+                    <input
+                      id="accountName"
+                      type="text"
+                      value={profile.payoutMethod?.accountName || ""}
+                      onChange={handlePayoutChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      placeholder="Enter legal name"
+                    />
                   </div>
                 </div>
 
-                <button className="w-full inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-gray-50 h-10 px-4 py-2">
-                  Add New Payout Method
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="accountNumber" className="text-sm font-medium leading-none">Account Number</label>
+                    <input
+                      id="accountNumber"
+                      type="text"
+                      value={profile.payoutMethod?.accountNumber || ""}
+                      onChange={handlePayoutChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      placeholder="Enter account number"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="routingNumber" className="text-sm font-medium leading-none">Routing Number (Optional)</label>
+                    <input
+                      id="routingNumber"
+                      type="text"
+                      value={profile.payoutMethod?.routingNumber || ""}
+                      onChange={handlePayoutChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      placeholder="Enter routing number"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg mt-4 flex gap-3 text-sm text-gray-600">
+                  <CreditCard className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" />
+                  <p>
+                    Earnings are disbursed on the 1st and 15th of every month. 
+                    Please double-check your account details to avoid payment delays.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-6">
+                <button onClick={saveProfile} disabled={saving} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-gray-900 text-white hover:bg-black h-10 px-4 py-2">
+                  <Save className="h-4 w-4 mr-2" />
+                  {saving ? "Saving..." : "Save Payout Info"}
                 </button>
               </div>
             </div>
           </div>
+
+
           
         </div>
       </div>

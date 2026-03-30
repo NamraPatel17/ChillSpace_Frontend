@@ -138,10 +138,10 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Occupancy Rate</span>
-                <span className="text-sm font-semibold text-gray-900">76%</span>
+                <span className="text-sm font-semibold text-gray-900">{dashboardData.performance.occupancy || 0}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-gray-900 h-2 rounded-full" style={{ width: "76%" }}></div>
+                <div className="bg-gray-900 h-2 rounded-full" style={{ width: `${dashboardData.performance.occupancy || 0}%` }}></div>
               </div>
 
               <div className="flex items-center justify-between mt-6">
@@ -154,18 +154,18 @@ export default function AdminDashboard() {
 
               <div className="flex items-center justify-between mt-6">
                 <span className="text-sm text-gray-600">Response Time</span>
-                <span className="text-sm font-semibold text-gray-900">2.3 hrs</span>
+                <span className="text-sm font-semibold text-gray-900">{dashboardData.performance.responseTime || 0} hrs</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-purple-600 h-2 rounded-full" style={{ width: "85%" }}></div>
+                <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${Math.min(100, Math.max(0, 100 - (dashboardData.performance.responseTime || 0) * 10))}%` }}></div>
               </div>
 
               <div className="flex items-center justify-between mt-6">
                 <span className="text-sm text-gray-600">Revenue Growth</span>
-                <span className="text-sm font-semibold text-gray-900">+18.7%</span>
+                <span className="text-sm font-semibold text-gray-900">+{dashboardData.performance.revenueGrowth || 0}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-orange-600 h-2 rounded-full" style={{ width: "92%" }}></div>
+                <div className="bg-orange-600 h-2 rounded-full" style={{ width: `${Math.min(100, dashboardData.performance.revenueGrowth || 0)}%` }}></div>
               </div>
             </div>
           </div>

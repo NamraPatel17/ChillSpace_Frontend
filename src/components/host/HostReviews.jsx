@@ -1,6 +1,7 @@
-import { Star, MessageSquare, ThumbsUp } from "lucide-react";
+import { Star, MessageSquare, ThumbsUp, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function HostReviews() {
   const [stats, setStats] = useState({
@@ -55,6 +56,30 @@ export default function HostReviews() {
 
   const totalRatings = stats.fiveStars + stats.fourStars + stats.threeStars + stats.twoStars + stats.oneStars;
   const getPercentage = (count) => (totalRatings === 0 ? 0 : (count / totalRatings) * 100);
+
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const submitResponse = async (reviewId, text) => {
+    if (!text.trim()) return toast.warning("Response cannot be empty");
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.put(`/reviews/${reviewId}/respond`, { response: text }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Update local state directly to show it immediately
+      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, response: text } : r));
+      toast.success("Response sent!");
+      setReplyingTo(null);
+      setReplyText("");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit response");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) return <div className="p-6">Loading reviews...</div>;
 
@@ -184,13 +209,46 @@ export default function HostReviews() {
                 <p className="text-sm font-semibold text-indigo-900 mb-2">Your Response:</p>
                 <p className="text-sm text-gray-700">{review.response}</p>
               </div>
+            ) : replyingTo === review.id ? (
+              <div className="mt-4 animate-in fade-in slide-in-from-top-2">
+                <textarea
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[100px]"
+                  placeholder={`Write your response to ${review.guest}...`}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  disabled={isSubmitting}
+                />
+                <div className="flex justify-end gap-2 mt-2">
+                  <button 
+                    onClick={() => { setReplyingTo(null); setReplyText(""); }}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={() => submitResponse(review.id, replyText)}
+                    className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 rounded-md transition-colors disabled:opacity-50"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Sending..." : "Post Response"}
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="flex items-center gap-3">
-                <button className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-indigo-300 text-indigo-700 hover:bg-indigo-50 h-9 px-3 transition-colors">
+                <button 
+                  onClick={() => setReplyingTo(review.id)}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-indigo-300 text-indigo-700 hover:bg-indigo-50 h-9 px-3 transition-colors"
+                >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Respond
                 </button>
-                <button className="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-gray-100 text-gray-700 h-9 px-3 transition-colors">
+                <button 
+                  onClick={() => submitResponse(review.id, "Thank you so much for your stay! We are thrilled you enjoyed the property and would love to host you again anytime.")}
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-gray-100 text-gray-700 h-9 px-3 transition-colors disabled:opacity-50"
+                >
                   <ThumbsUp className="h-4 w-4 mr-2" />
                   Thank Guest
                 </button>

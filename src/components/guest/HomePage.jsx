@@ -198,13 +198,24 @@ export const Home = () => {
                     </p>
                     <div className="mt-auto pt-4 flex items-center justify-between">
                       <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="ml-1 text-sm font-medium">
-                          {property.rating ? property.rating.toFixed(1) : "New"}
-                        </span>
-                        {property.reviews && (
+                        {property.rating > 0 ? (
+                          <>
+                            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                            <span className="ml-1 text-sm font-medium">
+                              {Number(property.rating).toFixed(1)}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Star className="h-4 w-4 text-gray-300" />
+                            <span className="ml-1 text-sm font-medium text-gray-500">
+                              New
+                            </span>
+                          </>
+                        )}
+                        {property.reviewsCount > 0 && (
                           <span className="ml-1 text-sm text-gray-500">
-                            ({property.reviews})
+                            ({property.reviewsCount} reviews)
                           </span>
                         )}
                       </div>

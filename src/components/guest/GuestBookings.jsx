@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Clock, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Calendar, MapPin, Clock, CheckCircle, XCircle, AlertTriangle, Star } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -11,8 +11,9 @@ import { CustomSelect } from "../ui/custom-select";
 
 const statusConfig = {
   confirmed: { color: "bg-green-100 text-green-800", icon: CheckCircle },
-  completed: { color: "bg-gray-100 text-blue-800", icon: CheckCircle },
+  completed: { color: "bg-green-100 text-green-800", icon: CheckCircle },
   cancelled: { color: "bg-red-100 text-red-800", icon: XCircle },
+  pending: { color: "bg-amber-100 text-amber-800", icon: Clock },
 };
 
 export default function GuestBookings() {
@@ -91,7 +92,7 @@ export default function GuestBookings() {
             status: (b.bookingStatus || "Confirmed").toLowerCase(),
             image: b.propertyId.images?.[0] || "",
             refundAmount: b.totalPrice || 0, 
-            reviewSubmitted: false,
+            reviewSubmitted: b.isReviewed || false,
             rawCheckIn: new Date(b.checkInDate),
             rawCheckOut: new Date(b.checkOutDate)
           };
@@ -131,6 +132,43 @@ export default function GuestBookings() {
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [disputeData, setDisputeData] = useState({ bookingId: "", reason: "Property condition", description: "" });
   const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
+
+  // Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewData, setReviewData] = useState({ propertyId: "", bookingId: "", rating: 5, reviewText: "" });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const handleRateProperty = (propertyId, bookingId) => {
+    setReviewData({ propertyId, bookingId, rating: 5, reviewText: "" });
+    setIsReviewModalOpen(true);
+  };
+
+  const submitReview = async () => {
+    if (!reviewData.reviewText.trim()) {
+      toast.warning("Please write a review comment.");
+      return;
+    }
+    setIsSubmittingReview(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      await axios.post("/reviews", reviewData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Review submitted successfully!");
+      setIsReviewModalOpen(false);
+      setReviewData({ propertyId: "", bookingId: "", rating: 5, reviewText: "" });
+      
+      // Update local state to hide button across specific mapped component bounds natively
+      setBookings(prev => {
+        const past = prev.past.map(b => b.id === reviewData.bookingId ? { ...b, reviewSubmitted: true } : b);
+        return { ...prev, past };
+      });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handleRaiseDispute = (bookingId) => {
     setDisputeData({ ...disputeData, bookingId });
@@ -221,6 +259,51 @@ export default function GuestBookings() {
         </div>
       )}
 
+      {/* Review Modal */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in zoom-in duration-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Rate Your Stay</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setReviewData({ ...reviewData, rating: star })}
+                      className="focus:outline-none transition-transform hover:scale-110"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          star <= reviewData.rating ? "text-amber-400 fill-current" : "text-gray-300"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Your Review</label>
+                <textarea
+                  value={reviewData.reviewText}
+                  onChange={(e) => setReviewData({ ...reviewData, reviewText: e.target.value })}
+                  placeholder="Tell others about your experience..."
+                  rows={4}
+                  className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" className="flex-1" onClick={() => setIsReviewModalOpen(false)}>Cancel</Button>
+                <Button className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={submitReview} disabled={isSubmittingReview}>
+                  {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-gray-900">My Bookings</h1>
@@ -278,9 +361,9 @@ export default function GuestBookings() {
                             {booking.location}
                           </p>
                         </div>
-                        <Badge className={`px-3 py-1 font-semibold border-0 ${statusConfig[booking.status]?.color || "bg-gray-100 text-gray-800"}`}>
+                        <Badge variant="custom" className={`px-3 py-1 font-semibold border-0 ${statusConfig[booking.status.toLowerCase()]?.color || "bg-gray-100 text-gray-800"}`}>
                           <span className="flex items-center gap-1.5">
-                            {statusConfig[booking.status]?.icon && React.createElement(statusConfig[booking.status].icon, { className: "h-3.5 w-3.5" })}
+                            {statusConfig[booking.status.toLowerCase()]?.icon && React.createElement(statusConfig[booking.status.toLowerCase()].icon, { className: "h-3.5 w-3.5" })}
                             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                           </span>
                         </Badge>
@@ -335,14 +418,12 @@ export default function GuestBookings() {
                           <Link to={`/user/properties/${booking.propertyId}`} className="w-full sm:w-auto">
                             <Button variant="outline" className="w-full font-semibold px-6 border-gray-300 hover:bg-gray-50 shadow-sm">View Property</Button>
                           </Link>
-                          {activeTab !== "cancelled" && (
-                            <Button variant="outline" className="w-full sm:w-auto font-semibold px-6 border-red-200 text-red-600 hover:bg-red-50 shadow-sm" onClick={() => handleRaiseDispute(booking.id)}>Report Issue</Button>
-                          )}
+                          <Button variant="outline" className="w-full sm:w-auto font-semibold px-6 border-red-200 text-red-600 hover:bg-red-50 shadow-sm" onClick={() => handleRaiseDispute(booking.id)}>Report Issue</Button>
                           {activeTab === "upcoming" && (
                             <Button variant="destructive" className="w-full sm:w-auto font-semibold px-6 shadow-md" onClick={() => handleCancelBooking(booking.id)}>Cancel Booking</Button>
                           )}
                           {activeTab === "past" && !booking.reviewSubmitted && (
-                            <Button className="w-full sm:w-auto bg-gray-900 hover:bg-black text-white font-semibold px-6 shadow-md">Write Review</Button>
+                            <Button className="w-full sm:w-auto bg-gray-900 hover:bg-black text-white font-semibold px-6 shadow-md" onClick={() => handleRateProperty(booking.propertyId, booking.id)}>Write Review</Button>
                           )}
                         </div>
                       </div>

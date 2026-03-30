@@ -107,6 +107,7 @@ export default function HostBookings() {
       });
       toast.success("Review submitted successfully!");
       setIsReviewModalOpen(false);
+      fetchBookings(); // Refresh the list so the Rated button disappears immediately
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to submit review.");
     } finally {
@@ -153,32 +154,71 @@ export default function HostBookings() {
     <div className="space-y-6">
       {/* Rate Guest Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Rate Guest</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Rating (1-5)</label>
-                <input
-                  type="number" min="1" max="5"
-                  value={reviewData.rating}
-                  onChange={(e) => setReviewData({ ...reviewData, rating: parseInt(e.target.value) })}
-                  className="w-full border rounded p-2"
-                />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-0 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Star className="w-5 h-5 text-indigo-600 fill-current" />
+                Rate Guest Experience
+              </h2>
+              <button 
+                onClick={() => setIsReviewModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors bg-white hover:bg-gray-100 rounded-full p-1"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">Overall Rating</label>
+                <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-xl border border-gray-100 w-fit">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewData({ ...reviewData, rating: star })}
+                      className={`transition-all duration-200 focus:outline-none hover:scale-110 ${
+                        reviewData.rating >= star 
+                          ? "text-amber-400" 
+                          : "text-gray-200 hover:text-amber-200"
+                      }`}
+                    >
+                      <Star className={`w-8 h-8 ${reviewData.rating >= star ? "fill-current" : ""}`} />
+                    </button>
+                  ))}
+                  <span className="ml-3 font-medium text-gray-600 text-sm">
+                    {reviewData.rating} out of 5
+                  </span>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Review</label>
+              
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Write a Review</label>
                 <textarea
                   value={reviewData.reviewText}
                   onChange={(e) => setReviewData({ ...reviewData, reviewText: e.target.value })}
+                  placeholder="Share details about the guest's communication, cleanliness, and adherence to house rules..."
                   rows={4}
-                  className="w-full border rounded p-2"
+                  className="w-full border border-gray-200 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-gray-400 resize-none bg-gray-50/50"
                 />
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => setIsReviewModalOpen(false)} className="flex-1 px-4 py-2 border rounded">Cancel</button>
-                <button onClick={submitReview} disabled={isSubmittingReview} className="flex-1 bg-indigo-600 text-white rounded">
-                  {isSubmittingReview ? "Submitting..." : "Submit Review"}
+              
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={() => setIsReviewModalOpen(false)} 
+                  className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={submitReview} 
+                  disabled={isSubmittingReview || !reviewData.reviewText.trim()} 
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 text-white font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-sm"
+                >
+                  {isSubmittingReview ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : "Submit Review"}
                 </button>
               </div>
             </div>
@@ -281,22 +321,26 @@ export default function HostBookings() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <p className="text-sm text-gray-600">Total</p>
           <p className="mt-1 text-2xl font-semibold text-gray-900">{stats.total}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <p className="text-sm text-gray-600">Confirmed</p>
-          <p className="mt-1 text-2xl font-semibold text-green-600">{stats.confirmed}</p>
+          <p className="mt-1 text-2xl font-semibold text-sky-600">{stats.confirmed}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <p className="text-sm text-gray-600">Pending</p>
-          <p className="mt-1 text-2xl font-semibold text-amber-600">{stats.pending}</p>
+          <p className="mt-1 text-2xl font-semibold text-amber-500">{stats.pending}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <p className="text-sm text-gray-600">Completed</p>
+          <p className="mt-1 text-2xl font-semibold text-green-600">{stats.completed}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <p className="text-sm text-gray-600">Cancelled</p>
-          <p className="mt-1 text-2xl font-semibold text-red-600">{stats.cancelled}</p>
+          <p className="mt-1 text-2xl font-semibold text-red-500">{stats.cancelled}</p>
         </div>
       </div>
 
@@ -364,17 +408,17 @@ export default function HostBookings() {
                             onClick: () => handleUpdateStatus(booking.id, "Completed")
                           }
                         ] : []),
-                        ...(booking.status === "Completed" ? [{
+                        ...(booking.status === "Completed" && !booking.isRatedByHost ? [{
                           label: "Rate Guest",
                           icon: Star,
                           onClick: () => handleRateGuest(booking.id)
                         }] : []),
-                        ...(booking.status !== "Cancelled" ? [{
+                        {
                           label: "Report Issue",
                           icon: AlertTriangle,
                           variant: "danger",
                           onClick: () => handleRaiseDispute(booking.id)
-                        }] : [])
+                        }
                       ]}
                     />
                   </td>

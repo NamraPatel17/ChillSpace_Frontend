@@ -26,13 +26,11 @@ export function CustomDropdown({
     
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      window.addEventListener("scroll", () => setIsOpen(false), true);
       window.addEventListener("resize", () => setIsOpen(false));
     }
     
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", () => setIsOpen(false), true);
       window.removeEventListener("resize", () => setIsOpen(false));
     };
   }, [isOpen]);
@@ -45,11 +43,14 @@ export function CustomDropdown({
     e.stopPropagation();
     if (!isOpen) {
       const rect = triggerRef.current.getBoundingClientRect();
+      const isSpaceLimited = (window.innerHeight - rect.bottom) < 200;
+
       setCoords({
-        top: rect.bottom + window.scrollY,
+        top: isSpaceLimited ? rect.top + window.scrollY - 8 : rect.bottom + window.scrollY + 8,
         left: rect.left + window.scrollX,
         width: rect.width,
-        right: rect.right + window.scrollX
+        right: rect.right + window.scrollX,
+        isDropUp: isSpaceLimited
       });
     }
     setIsOpen(!isOpen);
@@ -57,11 +58,12 @@ export function CustomDropdown({
 
   const menuStyles = {
     position: "absolute",
-    top: `${coords.top + 8}px`,
+    top: `${coords.top}px`,
     ...(align === "right" 
       ? { right: `${window.innerWidth - coords.right}px` } 
       : { left: `${coords.left}px` }
     ),
+    transform: coords.isDropUp ? "translateY(-100%)" : "none",
     zIndex: 9999
   };
 

@@ -180,11 +180,20 @@ export const PropertyDetails = () => {
         </h1>
         <div className="flex flex-wrap items-center gap-4 text-sm font-medium">
           <div className="flex items-center">
-            <Star className="h-4 w-4 text-yellow-400 fill-current mr-1.5" />
-            <span className="text-gray-900">{averageRating}</span>
-            <span className="text-gray-500 ml-1 leading-none underline cursor-pointer hover:text-gray-700 transition">
-              ({reviewCount} reviews)
-            </span>
+            {reviewCount > 0 ? (
+              <>
+                <Star className="h-4 w-4 text-yellow-400 fill-current mr-1.5" />
+                <span className="text-gray-900">{averageRating}</span>
+                <span className="text-gray-500 ml-1 leading-none underline cursor-pointer hover:text-gray-700 transition">
+                  ({reviewCount} reviews)
+                </span>
+              </>
+            ) : (
+              <>
+                <Star className="h-4 w-4 text-gray-300 mr-1.5" />
+                <span className="text-gray-500">New</span>
+              </>
+            )}
           </div>
           <div className="flex items-center text-gray-700">
             <MapPin className="h-4 w-4 mr-1.5 text-gray-900" />
@@ -341,7 +350,7 @@ export const PropertyDetails = () => {
                                 {guestName}
                               </p>
                               <p className="text-[12px] text-gray-500">
-                                {new Date(review.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                {new Date(review.createdAt || Date.now()).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                               </p>
                             </div>
                           </div>
@@ -355,7 +364,7 @@ export const PropertyDetails = () => {
                           </div>
                         </div>
                         <p className="text-gray-700 text-[14px] mt-3 leading-relaxed">
-                          {review.comment}
+                          {review.reviewText}
                         </p>
                       </CardContent>
                     </Card>

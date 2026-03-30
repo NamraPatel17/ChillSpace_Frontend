@@ -10,6 +10,7 @@ import {
   Lock,
   LogOut,
   Save,
+  Star,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
@@ -25,6 +26,7 @@ export default function GuestProfile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [hostReviews, setHostReviews] = useState([]);
   
   const [profile, setProfile] = useState({
     fullName: "",
@@ -39,6 +41,12 @@ export default function GuestProfile() {
       bookings: true,
       reviews: true,
       marketing: false
+    },
+    paymentMethod: {
+      cardNumber: "",
+      expiryDate: "",
+      cvv: "",
+      nameOnCard: ""
     }
   });
 
@@ -62,9 +70,21 @@ export default function GuestProfile() {
             notificationPreferences: {
               ...prev.notificationPreferences,
               ...(res.data.notificationPreferences || {})
+            },
+            paymentMethod: {
+              ...prev.paymentMethod,
+              ...(res.data.paymentMethod || {})
             }
           }));
         }
+
+        const reviewsRes = await axios.get("/reviews/me/guest", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (reviewsRes.data) {
+          setHostReviews(reviewsRes.data);
+        }
+
       } catch (error) {
         toast.error("Failed to load profile details");
         console.error(error);
@@ -78,10 +98,21 @@ export default function GuestProfile() {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setProfile(prev => ({
-      ...prev,
-      [id]: value
-    }));
+    if (id.startsWith("payment_")) {
+      const paymentField = id.split("_")[1];
+      setProfile(prev => ({
+        ...prev,
+        paymentMethod: {
+          ...prev.paymentMethod,
+          [paymentField]: value
+        }
+      }));
+    } else {
+      setProfile(prev => ({
+        ...prev,
+        [id]: value
+      }));
+    }
   };
 
   const handleNotificationChange = (key) => {
@@ -195,12 +226,13 @@ export default function GuestProfile() {
 
         {/* Settings Tabs */}
         <div className="lg:col-span-2">
-          <Tabs defaultValue="personal" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="personal">Personal</TabsTrigger>
-              <TabsTrigger value="payment">Payment</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
+          <Tabs defaultValue="personal" className="space-y-6 flex-1 w-full max-w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto overflow-hidden">
+              <TabsTrigger value="personal" className="py-2.5 whitespace-nowrap">Personal</TabsTrigger>
+              <TabsTrigger value="payment" className="py-2.5 whitespace-nowrap">Payment</TabsTrigger>
+              <TabsTrigger value="notifications" className="py-2.5 whitespace-nowrap">Notifications</TabsTrigger>
+              <TabsTrigger value="security" className="py-2.5 whitespace-nowrap">Security</TabsTrigger>
+              <TabsTrigger value="reviews" className="py-2.5 whitespace-nowrap">Reviews</TabsTrigger>
             </TabsList>
 
             {/* Personal Info */}
@@ -279,26 +311,53 @@ export default function GuestProfile() {
                   <CardTitle>Payment Methods</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <CreditCard className="h-8 w-8 text-gray-600" />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            •••• •••• •••• 4242
-                          </p>
-                          <p className="text-sm text-gray-600">Expires 12/2025</p>
-                        </div>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="payment_nameOnCard">Name on Card</Label>
+                      <Input
+                        id="payment_nameOnCard"
+                        type="text"
+                        value={profile.paymentMethod?.nameOnCard || ""}
+                        onChange={handleChange}
+                        placeholder="e.g. John Doe"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="payment_cardNumber">Card Number</Label>
+                      <Input
+                        id="payment_cardNumber"
+                        type="text"
+                        value={profile.paymentMethod?.cardNumber || ""}
+                        onChange={handleChange}
+                        placeholder="•••• •••• •••• ••••"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="payment_expiryDate">Expiry Date</Label>
+                        <Input
+                          id="payment_expiryDate"
+                          type="text"
+                          value={profile.paymentMethod?.expiryDate || ""}
+                          onChange={handleChange}
+                          placeholder="MM/YY"
+                        />
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button variant="destructive" size="sm">Remove</Button>
+                      <div className="space-y-2">
+                        <Label htmlFor="payment_cvv">CVV</Label>
+                        <Input
+                          id="payment_cvv"
+                          type="password"
+                          value={profile.paymentMethod?.cvv || ""}
+                          onChange={handleChange}
+                          placeholder="•••"
+                        />
                       </div>
                     </div>
                   </div>
 
-                  <Button className="w-full" variant="outline">
-                    + Add New Payment Method
+                  <Button onClick={saveProfile} disabled={saving} className="w-full bg-black hover:bg-gray-800 mt-4">
+                    {saving ? "Saving..." : "Save Payment Method"}
                   </Button>
                 </CardContent>
               </Card>
@@ -396,6 +455,56 @@ export default function GuestProfile() {
                       Sign Out
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Host Reviews on Guest */}
+            <TabsContent value="reviews">
+              <Card>
+                <CardHeader>
+                  <CardTitle>What Hosts Are Saying About You</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {hostReviews.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-100">
+                      <Star className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                      <p>You don't have any reviews from hosts yet.</p>
+                      <p className="text-sm mt-1">Complete a stay to start building your reputation!</p>
+                    </div>
+                  ) : (
+                    hostReviews.map((review) => (
+                      <div key={review._id} className="p-5 border border-gray-200 rounded-xl bg-white shadow-sm space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10 bg-indigo-100 flex items-center justify-center">
+                              <span className="text-indigo-700 font-semibold">
+                                {review.hostReviewer?.fullName ? review.hostReviewer.fullName.charAt(0).toUpperCase() : "H"}
+                              </span>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold text-gray-900">{review.hostReviewer?.fullName || "A Host"}</p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(review.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                                {review.propertyId && ` • Stayed at ${review.propertyId.title}`}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-md border border-amber-100">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-3.5 w-3.5 ${i < review.rating ? "text-amber-400 fill-current" : "text-gray-300"}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line bg-gray-50 p-3 rounded-lg">
+                          "{review.reviewText}"
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

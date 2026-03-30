@@ -6,10 +6,11 @@ const badgeVariants = {
   destructive: "bg-red-600 text-white hover:bg-red-700",
   outline: "text-gray-950 border border-gray-200 hover:bg-gray-100",
   success: "bg-green-100 text-green-800 border border-green-200 hover:bg-green-200",
+  custom: "",
 }
 
 function Badge({ className = "", variant = "default", ...props }) {
-  const variantClass = badgeVariants[variant] || badgeVariants.default
+  const variantClass = badgeVariants[variant] !== undefined ? badgeVariants[variant] : badgeVariants.default
   
   return (
     <div

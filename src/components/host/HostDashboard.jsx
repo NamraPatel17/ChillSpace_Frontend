@@ -155,21 +155,22 @@ export default function HostDashboard() {
           </div>
         </div>
 
-      </div>
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Quick Actions
+            </h2>
+          </div>
+          <div className="p-6 flex flex-col gap-4">
+            <Link to="/host/properties/add" className="w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+              Add New Property
+            </Link>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link to="/host/properties/add" className="block text-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
-            Add New Property
-          </Link>
-
-          <Link to="/host/bookings" className="block text-center px-4 py-3 bg-white text-gray-900 border border-gray-900 rounded-lg hover:bg-gray-50 transition-colors">
-            View All Bookings
-          </Link>
+            <Link to="/host/bookings" className="w-full text-center px-4 py-3 bg-white text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+              View All Bookings
+            </Link>
+          </div>
         </div>
       </div>
     </div>
