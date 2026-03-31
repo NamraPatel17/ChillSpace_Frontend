@@ -10,12 +10,14 @@ import {
   Menu,
   LogOut,
   X,
+  ShieldCheck
 } from "lucide-react";
 import { useState } from "react";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Verifications", href: "/admin/verifications", icon: ShieldCheck },
   { name: "Properties", href: "/admin/properties", icon: Home },
   { name: "Bookings", href: "/admin/bookings", icon: Calendar },
   { name: "Payments", href: "/admin/payments", icon: DollarSign },

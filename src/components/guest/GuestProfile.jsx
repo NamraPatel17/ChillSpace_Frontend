@@ -11,6 +11,8 @@ import {
   LogOut,
   Save,
   Star,
+  Camera,
+  Loader2
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
@@ -26,6 +28,8 @@ export default function GuestProfile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   const [hostReviews, setHostReviews] = useState([]);
   
   const [profile, setProfile] = useState({
@@ -153,6 +157,67 @@ export default function GuestProfile() {
     navigate("/login");
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    setUploadingPhoto(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.post("/users/profile/photo", formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data" 
+        }
+      });
+      
+      setProfile(prev => ({
+        ...prev,
+        profilePicture: res.data.profilePicture
+      }));
+      
+      toast.success("Profile photo updated successfully!");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("document", file);
+
+    setUploadingDoc(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.post("/users/verification/document", formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data" 
+        }
+      });
+      
+      setProfile(prev => ({
+        ...prev,
+        verificationStatus: false, 
+        idDocuments: res.data.idDocuments
+      }));
+      
+      toast.success("Document securely uploaded and queued for Admin review!");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to upload verification document");
+    } finally {
+      setUploadingDoc(false);
+    }
+  };
+
   const getInitials = (name) => {
     if (!name) return "U";
     return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
@@ -184,11 +249,37 @@ export default function GuestProfile() {
           <Card>
             <CardContent className="p-6">
               <div className="flex flex-col items-center text-center">
-                <Avatar className="h-24 w-24 mb-4 bg-gray-100 flex items-center justify-center">
-                  <span className="text-3xl font-semibold text-gray-700">
-                    {getInitials(profile.fullName)}
-                  </span>
-                </Avatar>
+                <div className="relative group mb-4">
+                  <Avatar className="h-24 w-24 bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
+                    {profile.profilePicture ? (
+                      <img 
+                        src={profile.profilePicture} 
+                        alt={profile.fullName} 
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-3xl font-semibold text-gray-700">
+                        {getInitials(profile.fullName)}
+                      </span>
+                    )}
+                  </Avatar>
+                  
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer overflow-hidden z-10">
+                    {uploadingPhoto ? (
+                      <Loader2 className="w-6 h-6 animate-spin text-white" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-white" />
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handlePhotoUpload} 
+                      disabled={uploadingPhoto}
+                    />
+                  </label>
+                </div>
+                
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">
                   {profile.fullName || "Guest User"}
                 </h2>
@@ -225,15 +316,17 @@ export default function GuestProfile() {
         </div>
 
         {/* Settings Tabs */}
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="personal" className="space-y-6 flex-1 w-full max-w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto overflow-hidden">
-              <TabsTrigger value="personal" className="py-2.5 whitespace-nowrap">Personal</TabsTrigger>
-              <TabsTrigger value="payment" className="py-2.5 whitespace-nowrap">Payment</TabsTrigger>
-              <TabsTrigger value="notifications" className="py-2.5 whitespace-nowrap">Notifications</TabsTrigger>
-              <TabsTrigger value="security" className="py-2.5 whitespace-nowrap">Security</TabsTrigger>
-              <TabsTrigger value="reviews" className="py-2.5 whitespace-nowrap">Reviews</TabsTrigger>
-            </TabsList>
+        <div className="lg:col-span-2 min-w-0 w-full">
+          <Tabs defaultValue="personal" className="space-y-6 w-full">
+            <div className="w-full overflow-x-auto">
+              <TabsList className="flex h-auto gap-1 p-1 min-w-max">
+                <TabsTrigger value="personal" className="py-2 px-3 whitespace-nowrap flex-shrink-0 text-sm">Personal</TabsTrigger>
+                <TabsTrigger value="payment" className="py-2 px-3 whitespace-nowrap flex-shrink-0 text-sm">Payment</TabsTrigger>
+                <TabsTrigger value="notifications" className="py-2 px-3 whitespace-nowrap flex-shrink-0 text-sm">Notifications</TabsTrigger>
+                <TabsTrigger value="security" className="py-2 px-3 whitespace-nowrap flex-shrink-0 text-sm">Security</TabsTrigger>
+                <TabsTrigger value="reviews" className="py-2 px-3 whitespace-nowrap flex-shrink-0 text-sm">Reviews</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Personal Info */}
             <TabsContent value="personal">
@@ -444,6 +537,43 @@ export default function GuestProfile() {
                         </div>
                         <Shield className="h-5 w-5 text-green-600" />
                       </div>
+                      
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <div className="flex items-center gap-3 mb-2 sm:mb-0">
+                          <Shield className="h-5 w-5 text-gray-700" />
+                          <div>
+                            <p className="font-medium text-gray-900">Government Identity Verification</p>
+                            <p className="text-sm text-gray-600">
+                              {profile.verificationStatus 
+                                ? "Your identity has been fully verified by an administrator." 
+                                : profile.idDocuments?.length > 0
+                                  ? "Document submitted. Pending administrative review."
+                                  : "Please upload a government-issued ID to certify your profile."}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {!profile.verificationStatus && (
+                          <div className="relative mt-2 sm:mt-0">
+                            <Button variant="outline" size="sm" disabled={uploadingDoc} className="relative z-0 overflow-hidden bg-white hover:bg-gray-100">
+                              {uploadingDoc ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <Camera className="h-4 w-4 mr-2" />
+                              )}
+                              Upload ID Scan
+                              <input 
+                                type="file" 
+                                accept="image/*,application/pdf" 
+                                className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full" 
+                                onChange={handleDocumentUpload} 
+                                disabled={uploadingDoc}
+                                title="Upload ID Document"
+                              />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -477,10 +607,14 @@ export default function GuestProfile() {
                       <div key={review._id} className="p-5 border border-gray-200 rounded-xl bg-white shadow-sm space-y-3">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10 bg-indigo-100 flex items-center justify-center">
-                              <span className="text-indigo-700 font-semibold">
-                                {review.hostReviewer?.fullName ? review.hostReviewer.fullName.charAt(0).toUpperCase() : "H"}
-                              </span>
+                            <Avatar className="h-10 w-10 bg-indigo-100 flex items-center justify-center overflow-hidden">
+                              {review.hostReviewer?.profilePicture ? (
+                                <img src={review.hostReviewer.profilePicture} alt={review.hostReviewer.fullName} className="h-full w-full object-cover" />
+                              ) : (
+                                <span className="text-indigo-700 font-semibold">
+                                  {review.hostReviewer?.fullName ? review.hostReviewer.fullName.charAt(0).toUpperCase() : "H"}
+                                </span>
+                              )}
                             </Avatar>
                             <div>
                               <p className="font-semibold text-gray-900">{review.hostReviewer?.fullName || "A Host"}</p>

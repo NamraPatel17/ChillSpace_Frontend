@@ -130,8 +130,12 @@ export default function HostMessages() {
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-11 h-11 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-semibold text-indigo-700">{conv.avatar || getInitials(conv.host)}</span>
+                    <div className="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {conv.profilePicture ? (
+                        <img src={conv.profilePicture} alt={conv.host} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-sm font-semibold text-gray-700">{conv.avatar || getInitials(conv.host)}</span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -170,10 +174,14 @@ export default function HostMessages() {
                     >
                       <ChevronLeft className="h-5 w-5 text-gray-400" />
                     </Button>
-                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                      <span className="font-semibold text-indigo-700 text-sm">
-                        {selectedConv?.avatar || getInitials(selectedConv?.host)}
-                      </span>
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {selectedConv?.profilePicture ? (
+                        <img src={selectedConv.profilePicture} alt={selectedConv?.host} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="font-semibold text-gray-700 text-sm">
+                          {selectedConv?.avatar || getInitials(selectedConv?.host)}
+                        </span>
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{selectedConv?.host || "Guest"}</h3>

@@ -160,6 +160,7 @@ export const PropertyDetails = () => {
 
   const hostName = property.hostId?.fullName || "Host Member";
   const hostInitial = hostName.charAt(0).toUpperCase();
+  const hostPicture = property.hostId?.profilePicture || "";
 
   const houseRules = property.houseRules?.length > 0 ? property.houseRules : [
     "No smoking inside",
@@ -342,8 +343,16 @@ export const PropertyDetails = () => {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-[8px]">
                           <div className="flex items-center">
-                            <div className="h-10 w-10 mr-3 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-700">
-                              {guestName.charAt(0).toUpperCase()}
+                            <div className="h-10 w-10 mr-3 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-700 overflow-hidden flex-shrink-0">
+                              {review.guestId?.profilePicture ? (
+                                <img
+                                  src={review.guestId.profilePicture}
+                                  alt={guestName}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                guestName.charAt(0).toUpperCase()
+                              )}
                             </div>
                             <div>
                               <p className="font-semibold text-gray-900 text-[14px] leading-tight mb-[2px]">
@@ -386,8 +395,16 @@ export const PropertyDetails = () => {
               <h2 className="text-lg font-semibold text-gray-900 mb-6 tracking-tight">Hosted by</h2>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center">
-                  <div className="h-12 w-12 mr-3 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium text-gray-700">
-                    {hostInitial}
+                  <div className="h-12 w-12 mr-3 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium text-gray-700 overflow-hidden flex-shrink-0">
+                    {hostPicture ? (
+                      <img
+                        src={hostPicture}
+                        alt={hostName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      hostInitial
+                    )}
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 flex items-center text-[15px]">

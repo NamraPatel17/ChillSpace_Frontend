@@ -180,10 +180,14 @@ export default function HostReviews() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-semibold text-indigo-700">
-                      {review.guest ? review.guest.charAt(0).toUpperCase() : "U"}
-                    </span>
+                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center overflow-hidden">
+                    {review.guestPicture ? (
+                      <img src={review.guestPicture} alt={review.guest} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-lg font-semibold text-indigo-700">
+                        {review.guest ? review.guest.charAt(0).toUpperCase() : "U"}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div>

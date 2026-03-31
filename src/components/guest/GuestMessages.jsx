@@ -143,9 +143,13 @@ export default function GuestMessages() {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <Avatar>
-                        <AvatarFallback>{conversation.avatar}</AvatarFallback>
-                      </Avatar>
+                      <div className="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {conversation.profilePicture ? (
+                          <img src={conversation.profilePicture} alt={conversation.host} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-semibold text-gray-700">{conversation.avatar}</span>
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-1">
                           <h3 className="font-medium text-gray-900 truncate">
@@ -189,11 +193,13 @@ export default function GuestMessages() {
                       >
                         <ChevronLeft className="h-5 w-5" />
                       </Button>
-                      <Avatar>
-                        <AvatarFallback>
-                          {selectedConversation.avatar}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {selectedConversation.profilePicture ? (
+                          <img src={selectedConversation.profilePicture} alt={selectedConversation.host} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-semibold text-gray-700">{selectedConversation.avatar}</span>
+                        )}
+                      </div>
                       <div>
                         <h3 className="font-medium text-gray-900">
                           {selectedConversation.host}

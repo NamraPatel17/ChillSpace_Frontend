@@ -6,6 +6,7 @@ import AdminPayments from "../components/admin/AdminPayments";
 import AdminProperties from "../components/admin/AdminProperties";
 import AdminReviews from "../components/admin/AdminReviews";
 import AdminUsers from "../components/admin/AdminUsers";
+import AdminVerifications from "../components/admin/AdminVerifications";
 
 import Login from "../components/Login";
 import Signup from "../components/Signup";
@@ -208,6 +209,10 @@ const router = createBrowserRouter([
       {
         path: "properties",
         element: <AdminProperties />
+      },
+      {
+        path: "verifications",
+        element: <AdminVerifications />
       },
       {
         path: "bookings",

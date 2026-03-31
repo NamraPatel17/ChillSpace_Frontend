@@ -70,7 +70,7 @@ export const Home = () => {
       <div 
         className="relative text-white py-32 md:py-48"
         style={{ 
-          backgroundImage: "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2670&auto=format&fit=crop')", 
+          backgroundImage: "url('/assets/home-hero.jpg')", 
           backgroundSize: "cover", 
           backgroundPosition: "center" 
         }}

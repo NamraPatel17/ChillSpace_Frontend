@@ -1,4 +1,4 @@
-import { User, Bell, CreditCard, Shield, Globe, Save, ChevronDown } from "lucide-react";
+import { User, Bell, CreditCard, Shield, Globe, Save, ChevronDown, Camera, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { CustomSelect } from "../../components/ui/custom-select";
@@ -27,6 +27,8 @@ export default function HostSettings() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   const [activeTab, setActiveTab] = useState("Profile");
   const [toast, setToast] = useState(null); // { type: 'success'|'error', message }
 
@@ -112,6 +114,66 @@ export default function HostSettings() {
     }
   };
 
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    setUploadingPhoto(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.post("/users/profile/photo", formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data" 
+        }
+      });
+      
+      setProfile(prev => ({
+        ...prev,
+        profilePicture: res.data.profilePicture
+      }));
+      showToast("success", "Profile photo updated successfully!");
+    } catch (error) {
+      showToast("error", error.response?.data?.message || "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("document", file);
+
+    setUploadingDoc(true);
+    try {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const res = await axios.post("/users/verification/document", formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data" 
+        }
+      });
+      
+      setProfile(prev => ({
+        ...prev,
+        verificationStatus: false, 
+        idDocuments: res.data.idDocuments
+      }));
+      
+      showToast("success", "ID Document uploaded and queued for Admin review!");
+    } catch (error) {
+      showToast("error", error.response?.data?.message || "Failed to upload verification document");
+    } finally {
+      setUploadingDoc(false);
+    }
+  };
+
   if (loading) {
     return <div className="p-6">Loading settings...</div>;
   }
@@ -165,7 +227,10 @@ export default function HostSettings() {
               <CreditCard className="h-5 w-5 mr-3" />
               Payout Methods
             </button>
-            <button className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+            <button 
+              onClick={() => setActiveTab("Security")}
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg ${activeTab === 'Security' ? 'text-white bg-gray-900' : 'text-gray-700 hover:bg-gray-50'}`}
+            >
               <Shield className="h-5 w-5 mr-3" />
               Security
             </button>
@@ -184,16 +249,39 @@ export default function HostSettings() {
 
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
-                    <span className="text-2xl font-semibold text-gray-900">
-                      {getInitials(profile.fullName)}
-                    </span>
+                  <div className="relative group">
+                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+                      {profile.profilePicture ? (
+                        <img 
+                          src={profile.profilePicture} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        <span className="text-2xl font-semibold text-gray-900">
+                          {getInitials(profile.fullName)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10">
+                      {uploadingPhoto ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <span className="text-xs font-medium">Change</span>
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handlePhotoUpload} 
+                        disabled={uploadingPhoto}
+                      />
+                    </label>
                   </div>
+                  
                   <div>
                     <p className="text-sm font-medium text-gray-900 mb-1">{profile.fullName}</p>
-                    <p className="text-xs text-gray-500">
-                      Standard profile avatar
-                    </p>
                   </div>
                 </div>
 
@@ -222,27 +310,16 @@ export default function HostSettings() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="phoneNumber" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone Number</label>
-                    <input
-                      id="phoneNumber"
-                      type="tel"
-                      value={profile.phoneNumber || ""}
-                      onChange={handleChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      placeholder="Enter your phone"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="language" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Language</label>
-                    <CustomSelect
-                      options={["English", "Spanish", "French", "German"]}
-                      value={profile.language}
-                      onChange={(val) => setProfile(prev => ({...prev, language: val}))}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <label htmlFor="phoneNumber" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Phone Number</label>
+                  <input
+                    id="phoneNumber"
+                    type="tel"
+                    value={profile.phoneNumber || ""}
+                    onChange={handleChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="Enter your phone"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -422,6 +499,56 @@ export default function HostSettings() {
             </div>
           </div>
 
+          {/* Security & Verification Settings */}
+          <div className={activeTab === 'Security' ? "block" : "hidden"}>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">
+                Security & Verification
+              </h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-4">Government Identity Verification</h3>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-0">
+                      <Shield className="h-5 w-5 text-gray-700" />
+                      <div>
+                        <p className="font-medium text-gray-900">Host Identity</p>
+                        <p className="text-sm text-gray-600">
+                          {profile.verificationStatus 
+                            ? "Your identity has been fully verified by an administrator." 
+                            : profile.idDocuments?.length > 0
+                              ? "Document submitted. Pending administrative review."
+                              : "Please upload a government-issued ID to certify your host profile."}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {!profile.verificationStatus && (
+                      <div className="relative">
+                        <button disabled={uploadingDoc} className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 h-9 px-4 relative z-0 overflow-hidden">
+                          {uploadingDoc ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin text-gray-500" />
+                          ) : (
+                            <Camera className="h-4 w-4 mr-2 text-gray-500" />
+                          )}
+                          Upload ID Scan
+                          <input 
+                            type="file" 
+                            accept="image/*,application/pdf" 
+                            className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full" 
+                            onChange={handleDocumentUpload} 
+                            disabled={uploadingDoc}
+                            title="Upload ID Document"
+                          />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           
         </div>

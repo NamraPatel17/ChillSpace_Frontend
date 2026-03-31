@@ -11,6 +11,7 @@ import {
   LogOut
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const navigation = [
   { name: "Home", href: "/user/home", icon: Home },
@@ -26,11 +27,32 @@ export const GuestNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState({ fullName: "", profilePicture: "" });
 
   useEffect(() => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     setIsLoggedIn(!!token);
+
+    if (token) {
+      axios.get("/users/profile", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        if (res.data) {
+          setUserProfile({
+            fullName: res.data.fullName || "",
+            profilePicture: res.data.profilePicture || ""
+          });
+        }
+      }).catch(() => {});
+    } else {
+      setUserProfile({ fullName: "", profilePicture: "" });
+    }
   }, [location.pathname]);
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+  };
 
   const logoutHandler = () => {
     localStorage.removeItem("user");
