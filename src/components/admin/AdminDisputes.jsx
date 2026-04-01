@@ -9,15 +9,15 @@ import { toast } from "react-toastify";
 import { CustomDropdown } from "../../components/ui/CustomDropdown";
 
 const statusConfig = {
-  pending: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
-  "in-progress": { color: "bg-gray-100 text-blue-800", icon: MessageSquare },
-  resolved: { color: "bg-green-100 text-green-800", icon: CheckCircle },
+  pending: { bg: "bg-yellow-100 text-yellow-800 border border-yellow-200", icon: Clock },
+  "in-progress": { bg: "bg-blue-100 text-blue-800 border border-blue-200", icon: MessageSquare },
+  resolved: { bg: "bg-green-100 text-green-800 border border-green-200", icon: CheckCircle },
 };
 
 const priorityConfig = {
-  high: "bg-red-100 text-red-800",
-  medium: "bg-orange-100 text-orange-800",
-  low: "bg-gray-100 text-gray-800",
+  high: "bg-red-100 text-red-800 border border-red-200",
+  medium: "bg-orange-100 text-orange-800 border border-orange-200",
+  low: "bg-gray-100 text-gray-600 border border-gray-200",
 };
 
 export default function AdminDisputes() {
@@ -151,15 +151,13 @@ export default function AdminDisputes() {
                         <span className="text-sm font-medium text-gray-900">
                           ID: {dispute.id.slice(-6)}
                         </span>
-                        <Badge
-                          className={StateObj.color}
-                        >
-                          <StatusIcon className="h-3 w-3 mr-1" />
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${StateObj.bg}`}>
+                          <StatusIcon className="h-3 w-3" />
                           {dispute.status}
-                        </Badge>
-                        <Badge className={priorityConfig[dispute.priority] || priorityConfig['low']}>
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${priorityConfig[dispute.priority] || priorityConfig['low']}`}>
                           {dispute.priority}
-                        </Badge>
+                        </span>
                       </div>
                       <h3 className="font-medium text-gray-900 mb-1">
                         {dispute.issue}

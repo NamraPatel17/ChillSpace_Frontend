@@ -115,11 +115,12 @@ export default function AdminBookings() {
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         {[
           { label: "Total Bookings", value: data.stats.total, icon: Calendar, color: "text-gray-900" },
           { label: "Confirmed", value: data.stats.confirmed, icon: CheckCircle, color: "text-green-600" },
           { label: "Pending", value: data.stats.pending, icon: Clock, color: "text-yellow-600" },
+          { label: "Completed", value: data.stats.completed, icon: CheckCircle, color: "text-blue-600" },
           { label: "Cancelled", value: data.stats.cancelled, icon: XCircle, color: "text-red-600" },
         ].map((stat, i) => (
           <Card key={i}>
@@ -201,10 +202,15 @@ export default function AdminBookings() {
                             onClick: () => navigate(`/user/properties/${booking.propertyId?._id}`)
                           },
                           {
-                            label: "Report User",
-                            icon: AlertTriangle,
+                            label: "Mark Completed",
+                            icon: CheckCircle,
+                            onClick: () => handleUpdateStatus(booking._id, "Completed")
+                          },
+                          {
+                            label: "Cancel Booking",
+                            icon: XCircle,
                             variant: "danger",
-                            onClick: () => alert("Report User feature coming soon.") // Stub for future dispute integration
+                            onClick: () => handleUpdateStatus(booking._id, "Cancelled")
                           }
                         ]}
                       />

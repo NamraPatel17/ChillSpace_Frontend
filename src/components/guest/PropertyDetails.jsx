@@ -27,6 +27,7 @@ export const PropertyDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [guests, setGuests] = useState();
   const [availability, setAvailability] = useState({ merged: [] });
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   const guestId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
 
@@ -336,7 +337,7 @@ export const PropertyDetails = () => {
               <p className="text-gray-500 italic">No reviews yet for this property. Be the first to stay and review!</p>
             ) : (
               <div className="space-y-4">
-                {reviews.slice(0, 4).map((review) => {
+                {(showAllReviews ? reviews : reviews.slice(0, 4)).map((review) => {
                   const guestName = review.guestId?.fullName || "Guest User";
                   return (
                     <Card key={review._id} className="shadow-none border border-gray-200">
@@ -383,9 +384,12 @@ export const PropertyDetails = () => {
             )}
             
             {reviewCount > 4 && (
-              <Button variant="outline" className="mt-4 text-sm font-medium border-gray-300">
-                Show all {reviewCount} reviews
-              </Button>
+              <button
+                onClick={() => setShowAllReviews(prev => !prev)}
+                className="mt-4 text-sm font-medium border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors"
+              >
+                {showAllReviews ? "Show less" : `Show all ${reviewCount} reviews`}
+              </button>
             )}
           </div>
 
