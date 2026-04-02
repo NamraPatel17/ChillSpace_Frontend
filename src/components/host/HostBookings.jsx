@@ -374,7 +374,15 @@ export default function HostBookings() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{booking.id?.slice(-6)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{booking.property}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{booking.guest}</div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="text-sm font-semibold text-gray-900">{booking.guest}</div>
+                      {booking.guestVerified && (
+                        <div className="flex items-center text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded border border-green-100 font-bold uppercase tracking-tight">
+                          <ShieldCheck className="w-3 h-3 mr-0.5" />
+                          Verified
+                        </div>
+                      )}
+                    </div>
                     <div className="text-sm text-gray-500">{booking.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.checkIn}</td>

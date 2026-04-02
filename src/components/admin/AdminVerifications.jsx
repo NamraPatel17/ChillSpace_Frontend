@@ -90,77 +90,85 @@ export default function AdminVerifications() {
         <CardContent>
           <div className="space-y-6">
             {verifications.length > 0 ? verifications.map((user) => (
-              <div key={user.documentId} className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm flex flex-col md:flex-row gap-6">
+              <div key={user.documentId} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex flex-col lg:grid lg:grid-cols-12">
                 
-                {/* User Info */}
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-14 w-14 bg-gray-100 flex items-center justify-center border">
-                      {user.profilePicture ? (
-                        <img src={user.profilePicture} alt="Profile" className="h-full w-full object-cover rounded-full" />
-                      ) : (
-                        <span className="text-xl font-semibold text-gray-600">{getInitials(user.name)}</span>
-                      )}
-                    </Avatar>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                {/* User Info & Actions - 5 columns on desktop */}
+                <div className="p-6 lg:col-span-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-gray-100">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12 bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm">
+                        {user.profilePicture ? (
+                          <img src={user.profilePicture} alt="Profile" className="h-full w-full object-cover rounded-full" />
+                        ) : (
+                          <span className="text-lg font-semibold text-gray-600">{getInitials(user.name)}</span>
+                        )}
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-bold text-gray-900 truncate">{user.name}</h3>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                      <Badge variant="secondary" className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5">
+                        {user.role}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="ml-auto bg-gray-50 text-gray-700">
-                      {user.role}
-                    </Badge>
+
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                      <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-0.5">Submitted</p>
+                        <p className="text-xs font-semibold text-gray-700">{user.submittedAt}</p>
+                      </div>
+                      <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-0.5">ID</p>
+                        <p className="text-xs font-mono text-gray-700 truncate">{user.id.slice(-8)}</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 text-sm mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
-                    <div>
-                      <p className="font-medium text-gray-500">Submission Date</p>
-                      <p className="text-gray-900">{user.submittedAt}</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-500">System Trace ID</p>
-                      <p className="text-gray-900 font-mono text-xs mt-0.5">{user.id}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-2">
+                  <div className="flex flex-col sm:flex-row gap-2 mt-6 lg:mt-0">
                     <Button 
                       onClick={() => handleAction(user.id, user.documentId, "approve")}
                       disabled={processingId === user.documentId}
-                      className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                      className="bg-green-600 hover:bg-green-700 text-white flex-1 h-10 text-xs font-bold"
                     >
-                      <CheckCircle className="h-4 w-4 mr-2" />
+                      <CheckCircle className="h-3.5 w-3.5 mr-2" />
                       Approve Identity
                     </Button>
                     <Button 
                       onClick={() => handleAction(user.id, user.documentId, "reject")}
                       disabled={processingId === user.documentId}
                       variant="outline"
-                      className="text-red-600 border-red-200 hover:bg-red-50 flex-1 flex"
+                      className="text-red-600 border-red-200 hover:bg-red-50 flex-1 h-10 text-xs font-bold"
                     >
-                      <XCircle className="h-4 w-4 mr-2" />
+                      <XCircle className="h-3.5 w-3.5 mr-2" />
                       Reject Scan
                     </Button>
                   </div>
                 </div>
 
-                {/* Document Viewer (Cloudinary Asset) */}
-                <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex items-center justify-center relative min-h-[300px]">
+                {/* Document Viewer - 7 columns on desktop */}
+                <div className="lg:col-span-7 bg-gray-50 flex items-center justify-center relative min-h-[250px] lg:h-[350px]">
                   {user.documentUrl.toLowerCase().endsWith(".pdf") ? (
                     <iframe 
                       src={`${user.documentUrl}#toolbar=0`} 
-                      className="w-full h-full min-h-[400px]" 
+                      className="w-full h-full" 
                       title="ID Document" 
                     />
                   ) : (
-                    <div className="relative w-full h-full group">
+                    <div className="relative w-full h-full group bg-gray-900/5">
                       <img 
                         src={user.documentUrl} 
                         alt="Gov ID Scan" 
-                        className="w-full h-full object-contain bg-gray-900/5 transition-transform duration-300"
+                        className="w-full h-full object-contain"
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <a href={user.documentUrl} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white text-gray-900 rounded-md text-sm font-medium shadow-lg hover:bg-gray-50">
-                          View Full Resolution (New Tab)
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-4 text-center">
+                        <p className="text-white text-xs font-medium">Original Document Scan</p>
+                        <a 
+                          href={user.documentUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="px-4 py-2 bg-white text-gray-900 rounded-full text-xs font-bold shadow-xl hover:bg-indigo-50 transition-colors"
+                        >
+                          View Full Resolution
                         </a>
                       </div>
                     </div>

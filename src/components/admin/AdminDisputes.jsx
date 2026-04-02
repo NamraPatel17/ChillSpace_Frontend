@@ -165,14 +165,23 @@ export default function AdminDisputes() {
                       <p className="text-sm text-gray-600 mb-2">
                         {dispute.description}
                       </p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span>By: {dispute.guest} ({dispute.guestEmail})</span>
-                        <span>•</span>
-                        <span>Against: {dispute.host}</span>
-                        <span>•</span>
-                        <span>{dispute.property}</span>
-                        <span>•</span>
-                        <span>{dispute.date}</span>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4 pt-3 border-t border-gray-50 text-[11px]">
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-gray-400 uppercase tracking-tight">By:</span>
+                          <span className="text-gray-700 truncate max-w-[120px]">{dispute.guest}</span>
+                        </div>
+                        <div className="hidden sm:block text-gray-300">|</div>
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-gray-400 uppercase tracking-tight">Against:</span>
+                          <span className="text-gray-700 truncate max-w-[120px]">{dispute.host}</span>
+                        </div>
+                        <div className="hidden sm:block text-gray-300">|</div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-indigo-600 font-semibold">{dispute.property}</span>
+                        </div>
+                        <div className="ml-auto text-gray-400 font-medium">
+                          {dispute.date}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center ml-4">

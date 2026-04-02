@@ -335,9 +335,14 @@ export default function AdminUsers() {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
-                        {user.role === "Host" ? `${user.properties} Properties` : `${user.bookings} Bookings`}
-                      </span>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-xs font-bold text-gray-900">
+                          {user.role === "Host" ? user.properties : user.bookings}
+                        </span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                          {user.role === "Host" ? "Properties" : "Bookings"}
+                        </span>
+                      </div>
                     </td>
                     <td className="py-4 px-4">
                       <span className="text-xs text-gray-500 font-medium">{user.joined}</span>

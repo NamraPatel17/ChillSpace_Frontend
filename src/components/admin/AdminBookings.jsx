@@ -200,17 +200,6 @@ export default function AdminBookings() {
                             label: "View Listing",
                             icon: Eye,
                             onClick: () => navigate(`/user/properties/${booking.propertyId?._id}`)
-                          },
-                          {
-                            label: "Mark Completed",
-                            icon: CheckCircle,
-                            onClick: () => handleUpdateStatus(booking._id, "Completed")
-                          },
-                          {
-                            label: "Cancel Booking",
-                            icon: XCircle,
-                            variant: "danger",
-                            onClick: () => handleUpdateStatus(booking._id, "Cancelled")
                           }
                         ]}
                       />

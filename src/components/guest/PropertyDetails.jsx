@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import {
   MapPin, Star, Users, Bed, Bath, Wifi, Car, Waves, Home,
-  Calendar, Shield, MessageCircle, CheckCircle, ChevronLeft, ChevronRight, ChevronDown
+  Calendar, Shield, ShieldCheck, MessageCircle, CheckCircle, ChevronLeft, ChevronRight, ChevronDown
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
@@ -411,12 +411,19 @@ export const PropertyDetails = () => {
                     )}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 flex items-center text-[15px]">
-                      {hostName}
-                      <Shield className="h-4 w-4 text-gray-800 ml-1.5" />
-                    </p>
+                    <div className="flex items-center gap-1.5 mb-[2px]">
+                      <p className="font-semibold text-gray-900 text-[15px]">
+                        {hostName}
+                      </p>
+                      {property.hostId?.verificationStatus && (
+                        <div className="flex items-center text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded border border-green-100 font-bold uppercase tracking-tight">
+                          <ShieldCheck className="w-3 h-3 mr-0.5" />
+                          Verified
+                        </div>
+                      )}
+                    </div>
                     <p className="text-[12px] text-gray-500">
-                      Member since 2026
+                      Member since {new Date(property.hostId?.createdAt || Date.now()).getFullYear()}
                     </p>
                   </div>
                 </div>
