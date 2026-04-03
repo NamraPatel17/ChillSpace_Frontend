@@ -15,10 +15,13 @@ export default function HostBookings() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [period, setPeriod] = useState("all"); // all | 15d | 1m | 3m
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (activePeriod) => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const res = await axios.get("/hosts/bookings", {
+      const periodMap = { "15d": "last15", "1m": "lastMonth", "3m": "last3Months" };
+      const apiPeriod = periodMap[activePeriod] || "";
+      const url = apiPeriod ? `/hosts/bookings?period=${apiPeriod}` : "/hosts/bookings";
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(res.data.bookings || []);
@@ -31,8 +34,8 @@ export default function HostBookings() {
   };
 
   useEffect(() => {
-    fetchBookings();
-  }, []);
+    fetchBookings(period);
+  }, [period]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
@@ -41,18 +44,13 @@ export default function HostBookings() {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`Booking ${newStatus.toLowerCase()} successfully!`);
-      fetchBookings();
+      fetchBookings(period);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update status");
     }
   };
 
   const filteredBookings = useMemo(() => {
-    const now = new Date();
-    const daysMap = { "15d": 15, "1m": 30, "3m": 90 };
-    const cutoffDays = daysMap[period];
-    const cutoff = cutoffDays ? new Date(now.getTime() - cutoffDays * 24 * 60 * 60 * 1000) : null;
-
     return bookings.filter(b => {
       if (statusFilter !== "All" && b.status !== statusFilter) return false;
       if (search) {
@@ -60,28 +58,20 @@ export default function HostBookings() {
         if (
           !b.property?.toLowerCase().includes(q) &&
           !b.guest?.toLowerCase().includes(q) &&
-          !b.id?.toLowerCase().includes(q)
+          !String(b.id)?.toLowerCase().includes(q)
         ) return false;
-      }
-      if (cutoff) {
-        const checkIn = new Date(b.checkIn);
-        if (isNaN(checkIn) || checkIn < cutoff) return false;
       }
       return true;
     });
-  }, [bookings, search, statusFilter, period]);
+  }, [bookings, search, statusFilter]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Confirmed":
-      case "Completed":
-        return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-amber-100 text-amber-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      case "Completed":  return "bg-green-100 text-green-700";
+      case "Confirmed":  return "bg-indigo-100 text-indigo-700";
+      case "Pending":    return "bg-amber-100 text-amber-800";
+      case "Cancelled":  return "bg-red-100 text-red-700";
+      default:           return "bg-gray-100 text-gray-800";
     }
   };
 

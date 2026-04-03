@@ -49,7 +49,7 @@ export default function AdminPayments() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-semibold text-gray-900">${data.stats.totalRevenue.toLocaleString()}</p>
+                <p className="text-2xl font-semibold text-gray-900">₹{data.stats.totalRevenue.toLocaleString()}</p>
                 <div className="flex items-center mt-2 text-sm">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-green-600">Active</span>
@@ -65,7 +65,7 @@ export default function AdminPayments() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Platform Fees</p>
-                <p className="text-2xl font-semibold text-gray-900">${data.stats.platformFees.toLocaleString()}</p>
+                <p className="text-2xl font-semibold text-gray-900">₹{data.stats.platformFees.toLocaleString()}</p>
                 <div className="flex items-center mt-2 text-sm">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-green-600">10% Default</span>
@@ -81,7 +81,7 @@ export default function AdminPayments() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Host Payouts</p>
-                <p className="text-2xl font-semibold text-gray-900">${data.stats.hostPayouts.toLocaleString()}</p>
+                <p className="text-2xl font-semibold text-gray-900">₹{data.stats.hostPayouts.toLocaleString()}</p>
                 <div className="flex items-center mt-2 text-sm">
                   <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                   <span className="text-green-600">90% Derived</span>
@@ -97,7 +97,7 @@ export default function AdminPayments() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Processing</p>
-                <p className="text-2xl font-semibold text-gray-900">${data.stats.processing.toLocaleString()}</p>
+                <p className="text-2xl font-semibold text-gray-900">₹{data.stats.processing.toLocaleString()}</p>
                 <div className="flex items-center mt-2 text-sm">
                   <ArrowUpRight className="h-4 w-4 text-gray-600 mr-1" />
                   <span className="text-gray-600">Pending</span>
@@ -120,7 +120,7 @@ export default function AdminPayments() {
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">Guest Payments</p>
-                  <p className="text-xl font-semibold text-gray-900">${data.stats.totalRevenue.toLocaleString()}</p>
+                  <p className="text-xl font-semibold text-gray-900">₹{data.stats.totalRevenue.toLocaleString()}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-green-600">100%</p>
@@ -129,7 +129,7 @@ export default function AdminPayments() {
               <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">Platform Revenue (10%)</p>
-                  <p className="text-xl font-semibold text-gray-900">${data.stats.platformFees.toLocaleString()}</p>
+                  <p className="text-xl font-semibold text-gray-900">₹{data.stats.platformFees.toLocaleString()}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-green-600">10%</p>
@@ -138,7 +138,7 @@ export default function AdminPayments() {
               <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                 <div>
                   <p className="text-sm text-gray-600">Host Payouts (90%)</p>
-                  <p className="text-xl font-semibold text-gray-900">${data.stats.hostPayouts.toLocaleString()}</p>
+                  <p className="text-xl font-semibold text-gray-900">₹{data.stats.hostPayouts.toLocaleString()}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-purple-600">90%</p>
@@ -160,7 +160,7 @@ export default function AdminPayments() {
                     <p className="text-sm font-medium text-gray-900">{host.name}</p>
                     <p className="text-xs text-gray-500">{host.properties} properties</p>
                   </div>
-                  <p className="text-sm font-semibold text-gray-900">${host.earnings.toLocaleString()}</p>
+                  <p className="text-sm font-semibold text-gray-900">₹{host.earnings.toLocaleString()}</p>
                 </div>
               )) : (
                 <p className="text-sm text-gray-500">No host earnings calculated yet.</p>
@@ -205,10 +205,10 @@ export default function AdminPayments() {
                       <span className="text-sm text-gray-900">{transaction.host}</span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm font-semibold text-gray-900">${transaction.amount.toLocaleString()}</span>
+                      <span className="text-sm font-semibold text-gray-900">₹{transaction.amount.toLocaleString()}</span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm text-green-600">${transaction.platformFee.toLocaleString()}</span>
+                      <span className="text-sm text-green-600">₹{transaction.platformFee.toLocaleString()}</span>
                     </td>
                     <td className="py-4 px-4">
                       {(() => {

@@ -34,11 +34,11 @@ export default function AdminVerifications() {
     fetchVerifications();
   }, []);
 
-  const handleAction = async (userId, documentId, action) => {
-    setProcessingId(documentId);
+  const handleAction = async (verificationId, action) => {
+    setProcessingId(verificationId);
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      await axios.patch(`/admin/verifications/${userId}/${action}`, { documentId }, {
+      await axios.patch(`/admin/verifications/${action}`, { verificationId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`Identity verification ${action}d successfully`);
@@ -90,7 +90,7 @@ export default function AdminVerifications() {
         <CardContent>
           <div className="space-y-6">
             {verifications.length > 0 ? verifications.map((user) => (
-              <div key={user.documentId} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex flex-col lg:grid lg:grid-cols-12">
+              <div key={user.verificationId} className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex flex-col lg:grid lg:grid-cols-12">
                 
                 {/* User Info & Actions - 5 columns on desktop */}
                 <div className="p-6 lg:col-span-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-gray-100">
@@ -126,16 +126,16 @@ export default function AdminVerifications() {
 
                   <div className="flex flex-col sm:flex-row gap-2 mt-6 lg:mt-0">
                     <Button 
-                      onClick={() => handleAction(user.id, user.documentId, "approve")}
-                      disabled={processingId === user.documentId}
+                      onClick={() => handleAction(user.verificationId, "approve")}
+                      disabled={processingId === user.verificationId}
                       className="bg-green-600 hover:bg-green-700 text-white flex-1 h-10 text-xs font-bold"
                     >
                       <CheckCircle className="h-3.5 w-3.5 mr-2" />
                       Approve Identity
                     </Button>
                     <Button 
-                      onClick={() => handleAction(user.id, user.documentId, "reject")}
-                      disabled={processingId === user.documentId}
+                      onClick={() => handleAction(user.verificationId, "reject")}
+                      disabled={processingId === user.verificationId}
                       variant="outline"
                       className="text-red-600 border-red-200 hover:bg-red-50 flex-1 h-10 text-xs font-bold"
                     >

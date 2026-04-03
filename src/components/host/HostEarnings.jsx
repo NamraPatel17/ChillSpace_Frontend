@@ -1,5 +1,5 @@
 import { DollarSign, TrendingUp, Calendar } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function HostEarnings() {
@@ -14,13 +14,15 @@ export default function HostEarnings() {
     averagePerBooking: 0
   });
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState("all"); // "all" | "thisMonth" | "last3" | "last6"
+  const [period, setPeriod] = useState("all"); // "all" | "last15" | "lastMonth" | "last3Months"
 
   useEffect(() => {
     const fetchEarnings = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-        const res = await axios.get("/hosts/earnings", {
+        const url = period !== "all" ? `/hosts/earnings?period=${period}` : "/hosts/earnings";
+        const res = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setEarningsData(res.data.earningsChart || []);
@@ -40,29 +42,13 @@ export default function HostEarnings() {
       }
     };
     fetchEarnings();
-  }, []);
+  }, [period]);
 
-  // Filter transactions based on selected period
-  const filteredTransactions = useMemo(() => {
-    if (period === "all") return transactions;
-    const now = new Date();
-    const msMap = { thisMonth: 30, last3: 90, last6: 180 };
-    const days = msMap[period] || 0;
-    const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-    return transactions.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return d >= cutoff;
-    });
-  }, [transactions, period]);
+  // Transactions are already filtered by the backend based on period
+  const filteredTransactions = transactions;
 
-  // Filter chart bars
-  const filteredChart = useMemo(() => {
-    if (period === "all") return earningsData;
-    const now = new Date();
-    const monthsMap = { thisMonth: 1, last3: 3, last6: 6 };
-    const months = monthsMap[period] || earningsData.length;
-    return earningsData.slice(-months);
-  }, [earningsData, period]);
+  // Chart: show all returned data (backend already filtered)
+  const filteredChart = earningsData;
 
   const maxAmount = filteredChart.length > 0
     ? Math.max(...filteredChart.map(d => d.amount))
@@ -71,10 +57,10 @@ export default function HostEarnings() {
   if (loading) return <div className="p-6">Loading earnings data...</div>;
 
   const periods = [
-    { key: "all", label: "All Time" },
-    { key: "thisMonth", label: "This Month" },
-    { key: "last3", label: "Last 3 Months" },
-    { key: "last6", label: "Last 6 Months" },
+    { key: "all",         label: "All Time" },
+    { key: "last15",      label: "Last 15 Days" },
+    { key: "lastMonth",   label: "Last Month" },
+    { key: "last3Months", label: "Last 3 Months" },
   ];
 
   return (
@@ -91,7 +77,7 @@ export default function HostEarnings() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Earnings</p>
-              <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.totalEarnings.toLocaleString()}</p>
+              <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.totalEarnings.toLocaleString()}</p>
               <p className="mt-2 text-sm text-green-600 flex items-center">
                 <TrendingUp className="h-4 w-4 mr-1" />
                 Lifetime total
@@ -105,19 +91,19 @@ export default function HostEarnings() {
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">This Month</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.thisMonthEarnings.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.thisMonthEarnings.toLocaleString()}</p>
           <p className="mt-2 text-sm text-indigo-600">{stats.thisMonthBookingsCount} bookings</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">Pending Payouts</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.pendingPayouts.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.pendingPayouts.toLocaleString()}</p>
           <p className="mt-2 text-sm text-amber-600">{stats.pendingCount} transactions</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <p className="text-sm text-gray-600">Average Per Booking</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">${stats.averagePerBooking.toLocaleString()}</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">₹{stats.averagePerBooking.toLocaleString()}</p>
           <p className="mt-2 text-sm text-gray-600">Across all properties</p>
         </div>
       </div>
@@ -154,7 +140,7 @@ export default function HostEarnings() {
                   style={{ height: `${(data.amount / maxAmount) * 200}px` }}
                 >
                   <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded z-10 whitespace-nowrap">
-                    ${data.amount.toLocaleString()}
+                    ₹{data.amount.toLocaleString()}
                   </div>
                 </div>
               </div>

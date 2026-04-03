@@ -169,8 +169,8 @@ export const AvailabilityCalendar = ({ unavailableDates = [], onRangeSelect, isH
           <Info className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0" />
           <p className="text-[13px] text-indigo-900 leading-snug">
             {selection.end 
-              ? `Selected: ${selection.start.toLocaleDateString()} to ${selection.end.toLocaleDateString()}`
-              : `Selected Check-in: ${selection.start.toLocaleDateString()}. Now pick a check-out date.`
+              ? `Selected: ${selection.start.toLocaleDateString('en-GB')} to ${selection.end.toLocaleDateString('en-GB')}`
+              : `Selected Check-in: ${selection.start.toLocaleDateString('en-GB')}. Now pick a check-out date.`
             }
           </p>
         </div>

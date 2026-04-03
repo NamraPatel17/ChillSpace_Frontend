@@ -85,8 +85,8 @@ export default function GuestBookings() {
             propertyId: b.propertyId._id, // Store propertyId correctly
             property: b.propertyId.title || "Unknown Property",
             location: b.propertyId.location || "Unknown Location",
-            checkIn: new Date(b.checkInDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
-            checkOut: new Date(b.checkOutDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+            checkIn: new Date(b.checkInDate).toLocaleDateString('en-GB'),
+            checkOut: new Date(b.checkOutDate).toLocaleDateString('en-GB'),
             guests: 2, 
             total: b.totalPrice || 0,
             status: (b.bookingStatus || "Confirmed").toLowerCase(),
@@ -398,7 +398,7 @@ export default function GuestBookings() {
                           <div className="flex flex-col">
                             <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">Refund Amount</p>
                             <p className="text-2xl font-bold text-gray-900">
-                              ${booking.total.toLocaleString()}
+                              ₹{booking.total.toLocaleString()}
                             </p>
                             <p className="text-xs text-green-600 font-medium mt-1">
                               Processed successfully
@@ -408,7 +408,7 @@ export default function GuestBookings() {
                           <div className="flex flex-col">
                             <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">Total Price</p>
                             <p className="text-2xl font-bold text-gray-900">
-                              ${booking.total.toLocaleString()}
+                              ₹{booking.total.toLocaleString()}
                             </p>
                           </div>
                         )}

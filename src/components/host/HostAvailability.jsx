@@ -112,8 +112,8 @@ export default function HostAvailability() {
             <p className="text-gray-500">No properties found. List a property first to manage availability.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <div className="bg-gray-50 p-4 rounded-xl">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="lg:flex-[1.2] bg-gray-50 p-4 rounded-xl">
               <AvailabilityCalendar 
                 isHost={true}
                 unavailableDates={availability.merged}
@@ -125,7 +125,7 @@ export default function HostAvailability() {
               />
             </div>
             
-            <div className="space-y-8">
+            <div className="lg:flex-[0.8] space-y-8">
               <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm space-y-4">
                 <h3 className="font-semibold text-gray-900 flex items-center">
                   <Plus className="h-4 w-4 mr-2 text-indigo-600" />
@@ -136,13 +136,13 @@ export default function HostAvailability() {
                       <div className="space-y-1">
                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Start Date</p>
                          <p className="text-sm font-medium text-gray-700 p-2 bg-gray-50 rounded border border-gray-100">
-                           {blockRange.start ? new Date(blockRange.start).toLocaleDateString() : "Select on calendar"}
+                           {blockRange.start ? new Date(blockRange.start).toLocaleDateString('en-GB') : "Select on calendar"}
                          </p>
                       </div>
                       <div className="space-y-1">
                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">End Date</p>
                          <p className="text-sm font-medium text-gray-700 p-2 bg-gray-50 rounded border border-gray-100">
-                           {blockRange.end ? new Date(blockRange.end).toLocaleDateString() : "Select on calendar"}
+                           {blockRange.end ? new Date(blockRange.end).toLocaleDateString('en-GB') : "Select on calendar"}
                          </p>
                       </div>
                    </div>
@@ -183,7 +183,7 @@ export default function HostAvailability() {
                              <div>
                                 <p className="text-sm font-semibold text-gray-900">{range.reason || "Blocked"}</p>
                                 <p className="text-xs text-gray-500">
-                                  {new Date(range.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - {new Date(range.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  {new Date(range.startDate).toLocaleDateString('en-GB')} - {new Date(range.endDate).toLocaleDateString('en-GB')}
                                 </p>
                              </div>
                           </div>

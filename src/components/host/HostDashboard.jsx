@@ -22,7 +22,7 @@ export default function HostDashboard() {
         setStats([
           {
             name: "Total Earnings",
-            value: `$${res.data.totalEarnings || 0}`,
+            value: `₹${res.data.totalEarnings || 0}`,
             change: "from completed bookings",
             icon: DollarSign,
             color: "bg-green-600",
@@ -141,8 +141,12 @@ export default function HostDashboard() {
                       <span
                         className={`inline-flex mt-2 px-2 py-1 text-xs font-medium rounded-full ${
                           booking.status === "Confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : booking.status === "Completed"
+                            ? "bg-green-100 text-green-700"
+                            : booking.status === "Cancelled"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
                         }`}
                       >
                         {booking.status}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { MapPin, Star, Filter, Grid, List, ChevronDown } from "lucide-react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { MapPin, Star, Filter, Grid, List, ChevronDown, ArrowLeft } from "lucide-react";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -13,8 +13,9 @@ import { toast } from "react-toastify";
 import { CustomSelect } from "../ui/custom-select";
 
 export default function SearchPage() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("grid");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 5000]);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -180,8 +181,8 @@ export default function SearchPage() {
                   className="mb-2"
                 />
                 <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
+                  <span>₹{priceRange[0]}</span>
+                  <span>₹{priceRange[1]}</span>
                 </div>
               </div>
 
@@ -260,6 +261,13 @@ export default function SearchPage() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6">
             <div className="flex-1 min-w-0">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 mb-2 transition-colors group"
+              >
+                <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+                Back
+              </button>
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">
                 {properties.length} Properties Found
               </h2>
@@ -347,7 +355,7 @@ export default function SearchPage() {
                         </div>
                         <div className="text-right">
                           <span className="text-lg font-semibold text-gray-900">
-                            ${property.pricePerNight}
+                            ₹{property.pricePerNight}
                           </span>
                           <span className="text-sm text-gray-500">/night</span>
                         </div>
@@ -420,7 +428,7 @@ export default function SearchPage() {
                             </div>
                             <div>
                               <span className="text-2xl font-semibold text-gray-900">
-                                ${property.pricePerNight}
+                                ₹{property.pricePerNight}
                               </span>
                               <span className="text-sm text-gray-500">
                                 /night

@@ -178,12 +178,12 @@ export default function AdminBookings() {
                     </td>
                     <td className="py-4 px-4 text-sm text-gray-600">
                       <div className="flex flex-col">
-                        <span>{new Date(booking.checkInDate).toLocaleDateString()}</span>
-                        <span className="text-[10px] text-gray-400">to {new Date(booking.checkOutDate).toLocaleDateString()}</span>
+                        <span>{new Date(booking.checkInDate).toLocaleDateString('en-GB')}</span>
+                        <span className="text-[10px] text-gray-400">to {new Date(booking.checkOutDate).toLocaleDateString('en-GB')}</span>
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <span className="text-sm font-bold text-gray-900">${booking.totalPrice?.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-gray-900">₹{booking.totalPrice?.toLocaleString()}</span>
                     </td>
                     <td className="py-4 px-4">
                       <Badge variant="outline" className={`${getStatusColor(booking.bookingStatus)} border-0 shadow-sm`}>

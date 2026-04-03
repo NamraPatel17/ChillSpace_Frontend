@@ -221,7 +221,7 @@ export const Home = () => {
                       </div>
                       <div className="text-right">
                         <span className="text-lg font-semibold text-gray-900">
-                          ${property.pricePerNight || property.price}
+                          ₹{property.pricePerNight || property.price}
                         </span>
                         <span className="text-sm text-gray-500">/night</span>
                       </div>

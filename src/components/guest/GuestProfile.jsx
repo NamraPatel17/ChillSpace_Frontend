@@ -12,7 +12,8 @@ import {
   Save,
   Star,
   Camera,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
@@ -206,8 +207,8 @@ export default function GuestProfile() {
       
       setProfile(prev => ({
         ...prev,
-        verificationStatus: false, 
-        idDocuments: res.data.idDocuments
+        verificationStatus: false,
+        verificationPending: true
       }));
       
       toast.success("Document securely uploaded and queued for Admin review!");
@@ -232,11 +233,18 @@ export default function GuestProfile() {
     );
   }
 
-  const joinDate = profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently";
+  const joinDate = profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-GB') : "Recently";
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
       <div className="mb-8">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 mb-4 transition-colors group"
+        >
+          <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+          Back
+        </button>
         <h1 className="text-3xl font-semibold text-gray-900">My Profile</h1>
         <p className="mt-2 text-gray-600">
           Manage your account settings and preferences
@@ -546,7 +554,7 @@ export default function GuestProfile() {
                             <p className="text-sm text-gray-600">
                               {profile.verificationStatus 
                                 ? "Your identity has been fully verified by an administrator." 
-                                : profile.idDocuments?.length > 0
+                                : profile.verificationPending
                                   ? "Document submitted. Pending administrative review."
                                   : "Please upload a government-issued ID to certify your profile."}
                             </p>
@@ -619,7 +627,7 @@ export default function GuestProfile() {
                             <div>
                               <p className="font-semibold text-gray-900">{review.hostReviewer?.fullName || "A Host"}</p>
                               <p className="text-xs text-gray-500">
-                                {new Date(review.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                                {new Date(review.createdAt).toLocaleDateString('en-GB')}
                                 {review.propertyId && ` • Stayed at ${review.propertyId.title}`}
                               </p>
                             </div>

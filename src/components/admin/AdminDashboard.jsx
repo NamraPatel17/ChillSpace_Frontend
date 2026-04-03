@@ -63,7 +63,7 @@ export default function AdminDashboard() {
     },
     {
       name: "Revenue",
-      value: `$${dashboardData.stats.revenue.toLocaleString()}`,
+      value: `₹${dashboardData.stats.revenue.toLocaleString()}`,
       change: "+18.7%",
       icon: DollarSign,
       color: "text-orange-600",

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import {
   MapPin, Star, Users, Bed, Bath, Wifi, Car, Waves, Home,
-  Calendar, Shield, ShieldCheck, MessageCircle, CheckCircle, ChevronLeft, ChevronRight, ChevronDown
+  Calendar, Shield, ShieldCheck, MessageCircle, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, ArrowLeft
 } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
@@ -175,6 +175,16 @@ export const PropertyDetails = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
+
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 mb-5 transition-colors group"
+      >
+        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+        Back
+      </button>
+
       {/* Title Section */}
       <div className="mb-6">
         <h1 className="text-3xl font-semibold text-gray-900 mb-3 tracking-tight">
@@ -360,7 +370,7 @@ export const PropertyDetails = () => {
                                 {guestName}
                               </p>
                               <p className="text-[12px] text-gray-500">
-                                {new Date(review.createdAt || Date.now()).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                {new Date(review.createdAt || Date.now()).toLocaleDateString('en-GB')}
                               </p>
                             </div>
                           </div>
@@ -460,7 +470,7 @@ export const PropertyDetails = () => {
               <div className="mb-6">
                 <div className="flex items-baseline">
                   <span className="text-[28px] font-semibold text-gray-900 tracking-tight">
-                    ${property.pricePerNight}
+                    ₹{property.pricePerNight}
                   </span>
                   <span className="text-gray-600 ml-1 text-[15px] font-medium">/night</span>
                 </div>
@@ -512,21 +522,21 @@ export const PropertyDetails = () => {
                   <div className="space-y-3 text-[14px]">
                     <div className="flex justify-between">
                       <span className="text-gray-600 underline">
-                        ${property.pricePerNight} x {nights} nights x {guestCount} guests
+                        ₹{property.pricePerNight} x {nights} nights x {guestCount} guests
                       </span>
                       <span className="text-gray-900">
-                        ${basePrice.toLocaleString()}
+                        ₹{basePrice.toLocaleString()}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 underline">Service fee</span>
-                      <span className="text-gray-900">${serviceFee.toLocaleString()}</span>
+                      <span className="text-gray-900">₹{serviceFee.toLocaleString()}</span>
                     </div>
                   </div>
                   <div className="h-[1px] bg-gray-200 my-4 w-full" />
                   <div className="flex justify-between font-bold text-[16px]">
                     <span>Total</span>
-                    <span>${totalPrice.toLocaleString()}</span>
+                    <span>₹{totalPrice.toLocaleString()}</span>
                   </div>
                 </>
               )}

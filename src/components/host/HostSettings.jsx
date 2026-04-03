@@ -162,8 +162,8 @@ export default function HostSettings() {
       
       setProfile(prev => ({
         ...prev,
-        verificationStatus: false, 
-        idDocuments: res.data.idDocuments
+        verificationStatus: false,
+        verificationPending: true
       }));
       
       showToast("success", "ID Document uploaded and queued for Admin review!");
@@ -517,7 +517,7 @@ export default function HostSettings() {
                         <p className="text-sm text-gray-600">
                           {profile.verificationStatus 
                             ? "Your identity has been fully verified by an administrator." 
-                            : profile.idDocuments?.length > 0
+                            : profile.verificationPending
                               ? "Document submitted. Pending administrative review."
                               : "Please upload a government-issued ID to certify your host profile."}
                         </p>
