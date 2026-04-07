@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { CustomDropdown } from "../ui/CustomDropdown";
 import { ConfirmationModal } from "../ui/ConfirmationModal";
+import PageLoader from "../ui/PageLoader";
 import { toast } from "react-toastify";
 import { MoreVertical, Star, MapPin, Trash2, Eye, ShieldAlert, ShieldCheck, Plus, Edit } from "lucide-react";
 
@@ -41,7 +42,7 @@ export default function HostProperties() {
         
         setProperties(res.data || []);
       } catch (error) {
-
+        console.error("Properties Fetch Error:", error);
       } finally {
         setLoading(false);
       }
@@ -51,7 +52,7 @@ export default function HostProperties() {
   }, []);
 
   if (loading) {
-    return <div className="p-6">Loading properties...</div>;
+    return <PageLoader variant="cards" />;
   }
 
   return (

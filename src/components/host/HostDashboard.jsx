@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+import PageLoader from "../ui/PageLoader";
+
 export default function HostDashboard() {
   const [stats, setStats] = useState(null);
   const [recentBookings, setRecentBookings] = useState([]);
@@ -54,7 +56,7 @@ export default function HostDashboard() {
         setRecentBookings(res.data.recentBookings || []);
         
       } catch (error) {
-
+        console.error("Dashboard Fetch Error:", error);
       } finally {
         setLoading(false);
       }
@@ -64,7 +66,7 @@ export default function HostDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="p-6">Loading dashboard data...</div>;
+    return <PageLoader variant="dashboard" />;
   }
 
   // Fallback if stats failed to load completely
