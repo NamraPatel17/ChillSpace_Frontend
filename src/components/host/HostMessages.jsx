@@ -32,7 +32,7 @@ export default function HostMessages() {
           setSelectedConv(res.data[0]);
         }
       } catch (err) {
-        console.error("Failed to load conversations", err);
+
       } finally {
         setLoadingConvs(false);
       }
@@ -50,7 +50,7 @@ export default function HostMessages() {
         const res = await axios.get(`/messages/${selectedId}`, { headers });
         setMessages(res.data || []);
       } catch (err) {
-        console.error("Failed to load messages", err);
+
       } finally {
         setLoadingMsgs(false);
       }
@@ -79,7 +79,7 @@ export default function HostMessages() {
       // Append the saved message
       setMessages(prev => [...prev, res.data.data || res.data]);
     } catch (err) {
-      console.error("Failed to send message", err);
+
     }
   };
 

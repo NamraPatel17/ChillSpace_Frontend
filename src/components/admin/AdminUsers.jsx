@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Search, MoreVertical, UserCheck, UserX, X, ShieldCheck, AlertTriangle, UserPlus, Trash2, Eye } from "lucide-react";
+import PageLoader from "../../components/ui/PageLoader";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { CustomDropdown } from "../../components/ui/CustomDropdown";
@@ -38,7 +39,7 @@ export default function AdminUsers() {
         setData(res.data);
       }
     } catch (err) {
-      console.error("Failed to load global users", err);
+
     } finally {
       setLoading(false);
     }
@@ -171,7 +172,7 @@ export default function AdminUsers() {
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div className="p-6">Loading platform users...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   return (
     <div className="space-y-6">

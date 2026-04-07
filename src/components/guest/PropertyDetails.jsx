@@ -42,7 +42,6 @@ export const PropertyDetails = () => {
       setReviews(revRes.data);
       setAvailability(availRes.data);
     } catch (err) {
-      console.log(err);
       toast.error("Failed to load property details");
     }
   };
@@ -60,10 +59,22 @@ export const PropertyDetails = () => {
     return diff / (1000 * 60 * 60 * 24);
   };
 
+  // Dynamically load the Razorpay checkout script
+  const loadRazorpayScript = () =>
+    new Promise((resolve) => {
+      if (document.getElementById("razorpay-script")) return resolve(true);
+      const script = document.createElement("script");
+      script.id = "razorpay-script";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
   const handleBooking = async () => {
     if (!guestId) {
       toast.error("Please login to book a reservation");
-      navigate("/login")
+      navigate("/login");
       return;
     }
 
@@ -74,42 +85,107 @@ export const PropertyDetails = () => {
 
     const nights = getNights();
     if (nights <= 0) {
-      toast.error("Check-out must cleanly follow check-in time");
+      toast.error("Check-out must be after check-in");
       return;
     }
 
     const guestCount = parseInt(guests) || 1;
     if (guestCount > (property.maxGuests || 10)) {
-       toast.error(`Maximum ${property.maxGuests || 10} guests allowed for this property`);
-       return;
+      toast.error(`Maximum ${property.maxGuests || 10} guests allowed`);
+      return;
     }
+
+    const basePrice = nights * (property.pricePerNight || 0) * guestCount;
+    const serviceFee = 500;
+    const totalAmount = basePrice + serviceFee;
 
     try {
       setLoading(true);
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      
-      const guestCount = parseInt(guests) || 1;
-      const res = await axios.post("/bookings", {
-        propertyId: id,
-        guestId: guestId,
-        checkInDate: checkInDate,
-        checkOutDate: checkOutDate,
-        totalPrice: (property.pricePerNight * nights * guestCount) + 500 // including per-guest pricing + fee
+
+      // Step 1 — Load Razorpay script
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Payment gateway failed to load. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Step 2 — Create Razorpay order on backend
+      const orderRes = await axios.post("/razorpay/create-order", {
+        amount: totalAmount,
+        receipt: `booking_${id}_${Date.now()}`
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (res.status === 201) {
-        toast.success("Booking created successfully 🎉");
-        setTimeout(() => navigate("/user/bookings"), 1500)
-      }
+      const { orderId, keyId } = orderRes.data;
+      setLoading(false);
+
+      // Step 3 — Open Razorpay checkout modal
+      const options = {
+        key: keyId,
+        amount: totalAmount * 100,
+        currency: "INR",
+        name: "ChillSpace",
+        description: `${property.title} · ${nights} night${nights > 1 ? "s" : ""}`,
+        image: property.images?.[0] || undefined,
+        order_id: orderId,
+        handler: async (response) => {
+          // Step 4 — Verify payment signature and create booking
+          try {
+            setLoading(true);
+            const verifyRes = await axios.post("/razorpay/verify", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              bookingData: {
+                propertyId: id,
+                guestId,
+                checkInDate,
+                checkOutDate,
+                totalPrice: totalAmount
+              }
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (verifyRes.status === 201) {
+              toast.success("Payment successful! Booking confirmed 🎉");
+              setTimeout(() => navigate("/user/bookings"), 1500);
+            }
+          } catch (err) {
+            toast.error(err.response?.data?.message || "Payment verification failed.");
+          } finally {
+            setLoading(false);
+          }
+        },
+        prefill: {
+          name: localStorage.getItem("userName") || sessionStorage.getItem("userName") || "",
+          email: "",
+        },
+        theme: { color: "#111827" },
+        modal: {
+          ondismiss: () => {
+            toast.info("Payment cancelled");
+            setLoading(false);
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (response) => {
+        toast.error(`Payment failed: ${response.error.description}`);
+        setLoading(false);
+      });
+      rzp.open();
+
     } catch (err) {
-      const msg = err.response?.data?.message || "Booking failed. Please try again.";
-      toast.error(msg);
-    } finally {
+      toast.error(err.response?.data?.message || "Failed to initiate payment.");
       setLoading(false);
     }
   };
+
 
   if (!property) {
     return (
@@ -510,7 +586,7 @@ export const PropertyDetails = () => {
                 disabled={loading}
                 className="w-full py-6 text-[15px] font-semibold bg-black hover:bg-gray-900 text-white rounded-md mb-4" 
               >
-                 {loading ? "Confirming..." : "Reserve"}
+                {loading ? "Processing..." : "Pay & Reserve"}
               </Button>
 
               <p className="text-center text-[13px] text-gray-500 font-medium mb-6">

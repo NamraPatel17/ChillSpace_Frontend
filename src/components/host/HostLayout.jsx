@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   Home,
   Calendar,
-  DollarSign,
+  IndianRupee,
   Star,
   MessageSquare,
   Settings,
@@ -21,7 +21,7 @@ const navigation = [
   { name: "Calendar", href: "/host/calendar", icon: Calendar },
   { name: "Bookings", href: "/host/bookings", icon: ClipboardList },
 
-  { name: "Earnings", href: "/host/earnings", icon: DollarSign },
+  { name: "Earnings", href: "/host/earnings", icon: IndianRupee },
   { name: "Reviews", href: "/host/reviews", icon: Star },
   { name: "Messages", href: "/host/messages", icon: MessageSquare },
   { name: "Settings", href: "/host/settings", icon: Settings },

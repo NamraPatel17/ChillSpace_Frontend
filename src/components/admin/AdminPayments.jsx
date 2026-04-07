@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
-import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight } from "lucide-react";
+import { IndianRupee, TrendingUp, TrendingDown, ArrowUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import PageLoader from "../../components/ui/PageLoader";
 
 export default function AdminPayments() {
   const [data, setData] = useState({
@@ -23,7 +24,7 @@ export default function AdminPayments() {
           setData(res.data);
         }
       } catch (err) {
-        console.error("Failed to load global payments data", err);
+
       } finally {
         setLoading(false);
       }
@@ -31,7 +32,7 @@ export default function AdminPayments() {
     fetchPayments();
   }, []);
 
-  if (loading) return <div className="p-6">Loading payments data...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   return (
     <div className="space-y-6">
@@ -55,7 +56,7 @@ export default function AdminPayments() {
                   <span className="text-green-600">Active</span>
                 </div>
               </div>
-              <DollarSign className="h-8 w-8 text-gray-900" />
+              <IndianRupee className="h-8 w-8 text-gray-900" />
             </div>
           </CardContent>
         </Card>
@@ -71,7 +72,7 @@ export default function AdminPayments() {
                   <span className="text-green-600">10% Default</span>
                 </div>
               </div>
-              <DollarSign className="h-8 w-8 text-green-600" />
+              <IndianRupee className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
@@ -87,7 +88,7 @@ export default function AdminPayments() {
                   <span className="text-green-600">90% Derived</span>
                 </div>
               </div>
-              <DollarSign className="h-8 w-8 text-purple-600" />
+              <IndianRupee className="h-8 w-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
@@ -103,7 +104,7 @@ export default function AdminPayments() {
                   <span className="text-gray-600">Pending</span>
                 </div>
               </div>
-              <DollarSign className="h-8 w-8 text-orange-600" />
+              <IndianRupee className="h-8 w-8 text-orange-600" />
             </div>
           </CardContent>
         </Card>

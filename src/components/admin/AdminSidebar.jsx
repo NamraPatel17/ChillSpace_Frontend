@@ -4,7 +4,7 @@ import {
   Users,
   Home,
   Calendar,
-  DollarSign,
+  IndianRupee,
   Star,
   MessageSquare,
   Menu,
@@ -20,7 +20,7 @@ const navigation = [
   { name: "Verifications", href: "/admin/verifications", icon: ShieldCheck },
   { name: "Properties", href: "/admin/properties", icon: Home },
   { name: "Bookings", href: "/admin/bookings", icon: Calendar },
-  { name: "Payments", href: "/admin/payments", icon: DollarSign },
+  { name: "Payments", href: "/admin/payments", icon: IndianRupee },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Disputes", href: "/admin/disputes", icon: MessageSquare },
 ];

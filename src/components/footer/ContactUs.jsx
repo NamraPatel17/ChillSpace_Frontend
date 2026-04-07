@@ -28,7 +28,7 @@ export default function ContactUs() {
                 <div>
                   <h3 className="font-semibold">Chat to us</h3>
                   <p className="text-sm text-gray-400 mb-1">Our friendly team is here to help.</p>
-                  <p className="text-blue-400 font-medium">hi@chillspace.com</p>
+                  <p className="text-blue-400 font-medium">chillspace.support02@gmail.com</p>
                 </div>
               </div>
               

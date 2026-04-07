@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { CustomSelect } from "../ui/custom-select";
 import { CustomDropdown } from "../ui/CustomDropdown";
+import PageLoader from "../ui/PageLoader";
 
 export default function HostBookings() {
   const [bookings, setBookings] = useState([]);
@@ -27,7 +28,7 @@ export default function HostBookings() {
       setBookings(res.data.bookings || []);
       if (res.data.stats) setStats(res.data.stats);
     } catch (error) {
-      console.error("Failed to fetch host bookings", error);
+
     } finally {
       setLoading(false);
     }
@@ -130,7 +131,7 @@ export default function HostBookings() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading host bookings...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   const statuses = ["All", "Confirmed", "Pending", "Cancelled", "Completed"];
   const periods = [

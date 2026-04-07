@@ -44,7 +44,7 @@ export const Home = () => {
            setLiveDestinations(sortedCities);
         }
       } catch (error) {
-        console.error("Failed to load featured properties from API", error);
+
       } finally {
         setIsLoading(false);
       }

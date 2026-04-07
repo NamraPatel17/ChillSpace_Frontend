@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { CustomSelect } from "../../components/ui/custom-select";
 import { toast } from "react-toastify";
+import PageLoader from "../../components/ui/PageLoader";
 import { CustomDropdown } from "../../components/ui/CustomDropdown";
 
 const statusConfig = {
@@ -36,7 +37,7 @@ export default function AdminDisputes() {
           setData(res.data);
         }
       } catch (err) {
-        console.error("Failed to load global disputes", err);
+
       } finally {
         setLoading(false);
       }
@@ -47,9 +48,11 @@ export default function AdminDisputes() {
   const updateDisputeStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      
       await axios.put(`/disputes/admin/${id}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
       // Refresh list
       const res = await axios.get(`/disputes/admin?status=${statusFilter}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -61,7 +64,7 @@ export default function AdminDisputes() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading disputes...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   return (
     <div className="space-y-6">

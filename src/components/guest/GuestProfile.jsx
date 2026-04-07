@@ -92,7 +92,7 @@ export default function GuestProfile() {
 
       } catch (error) {
         toast.error("Failed to load profile details");
-        console.error(error);
+
       } finally {
         setLoading(false);
       }
@@ -140,7 +140,7 @@ export default function GuestProfile() {
       toast.success("Profile saved successfully! 🎉");
     } catch (error) {
       toast.error("Failed to save profile. Please try again.");
-      console.error(error);
+
     } finally {
       setSaving(false);
     }

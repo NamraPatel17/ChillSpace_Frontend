@@ -115,7 +115,7 @@ export default function GuestBookings() {
 
         setBookings(formatted);
       } catch (err) {
-        console.error("Failed to fetch bookings:", err);
+
       } finally {
         setIsLoading(false);
       }

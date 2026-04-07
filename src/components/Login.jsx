@@ -29,18 +29,15 @@ export default function Login() {
 
         const role = res.data.role;
         const user = res.data.data;
-        console.log(res.data.token)
         
         // store user details for later use
-
         const storage = rememberMe ? localStorage : sessionStorage;
         storage.setItem("user", JSON.stringify(user));
         storage.setItem("role", role);
-        localStorage.setItem("token", res.data.token);
+        storage.setItem("token", res.data.token);
         if (user?._id) {
           storage.setItem("userId", user._id);
-          // also keep in localStorage for existing code paths
-          localStorage.setItem("userId", user._id);
+          localStorage.setItem("userId", user._id); // keep for existing code paths
         }
 
         if (role === "Guest") {

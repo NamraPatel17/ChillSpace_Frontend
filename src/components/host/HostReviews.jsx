@@ -2,6 +2,7 @@ import { Star, MessageSquare, ThumbsUp, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import PageLoader from "../ui/PageLoader";
 
 export default function HostReviews() {
   const [stats, setStats] = useState({
@@ -32,7 +33,7 @@ export default function HostReviews() {
           setReviews(res.data.reviews || []);
         }
       } catch (error) {
-        console.error("Failed to fetch host reviews", error);
+
       } finally {
         setLoading(false);
       }
@@ -81,7 +82,7 @@ export default function HostReviews() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading reviews...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,4 @@
-import { DollarSign, Home, Calendar, TrendingUp } from "lucide-react";
+import { IndianRupee, Home, Calendar, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -24,7 +24,7 @@ export default function HostDashboard() {
             name: "Total Earnings",
             value: `₹${res.data.totalEarnings || 0}`,
             change: "from completed bookings",
-            icon: DollarSign,
+            icon: IndianRupee,
             color: "bg-green-600",
           },
           {
@@ -54,7 +54,7 @@ export default function HostDashboard() {
         setRecentBookings(res.data.recentBookings || []);
         
       } catch (error) {
-        console.error("Failed to fetch host analytics", error);
+
       } finally {
         setLoading(false);
       }
@@ -69,7 +69,7 @@ export default function HostDashboard() {
 
   // Fallback if stats failed to load completely
   const metricsToRender = stats || [
-    { name: "Total Earnings", value: "$0", change: "", icon: DollarSign, color: "bg-green-600" },
+    { name: "Total Earnings", value: "₹0", change: "", icon: IndianRupee, color: "bg-green-600" },
     { name: "Active Properties", value: "0", change: "", icon: Home, color: "bg-indigo-600" },
     { name: "Bookings", value: "0", change: "", icon: Calendar, color: "bg-amber-500" },
     { name: "Confirmed", value: "0", change: "", icon: TrendingUp, color: "bg-sky-500" },

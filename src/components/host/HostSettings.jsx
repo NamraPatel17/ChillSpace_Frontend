@@ -60,7 +60,7 @@ export default function HostSettings() {
           }));
         }
       } catch (error) {
-        console.error("Failed to fetch profile settings", error);
+
       } finally {
         setLoading(false);
       }
@@ -107,7 +107,7 @@ export default function HostSettings() {
       });
       showToast("success", "Settings saved successfully!");
     } catch (error) {
-      console.error("Failed to save profile settings", error);
+
       showToast("error", "Failed to save settings. Please try again.");
     } finally {
       setSaving(false);

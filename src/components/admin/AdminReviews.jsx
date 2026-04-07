@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/button";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import PageLoader from "../../components/ui/PageLoader";
 
 const renderStars = (rating) =>
   Array.from({ length: 5 }).map((_, i) => (
@@ -45,7 +46,7 @@ export default function AdminReviews() {
       });
       if (res.data) setData(res.data);
     } catch (err) {
-      console.error("Failed to load global reviews", err);
+
     } finally {
       setLoading(false);
     }
@@ -68,7 +69,7 @@ export default function AdminReviews() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading reviews...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   const ReviewCard = ({ review, isGuestReview = false }) => (
     <div className="border-b border-gray-100 pb-5 last:border-0 last:pb-0">

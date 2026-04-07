@@ -4,6 +4,7 @@ import axios from "axios";
 import { CustomSelect } from "../../components/ui/custom-select";
 import { AvailabilityCalendar } from "../../components/ui/AvailabilityCalendar";
 import { toast } from "react-toastify";
+import PageLoader from "../../components/ui/PageLoader";
 
 export default function HostAvailability() {
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,7 @@ export default function HostAvailability() {
           setSelectedPropId(res.data[0]._id);
         }
       } catch (err) {
-        console.error("Failed to load host properties", err);
+
         toast.error("Failed to load properties");
       } finally {
         setLoading(false);
@@ -41,7 +42,7 @@ export default function HostAvailability() {
           const res = await axios.get(`/properties/${selectedPropId}/availability`);
           setAvailability(res.data);
         } catch (err) {
-          console.error("Failed to load availability", err);
+
         }
       };
       fetchAvailability();
@@ -82,7 +83,7 @@ export default function HostAvailability() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading availability management...</div>;
+  if (loading) return <PageLoader variant="calendar" />;
 
   return (
     <div className="space-y-6">

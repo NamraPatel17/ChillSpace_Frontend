@@ -41,7 +41,7 @@ export default function HostProperties() {
         
         setProperties(res.data || []);
       } catch (error) {
-        console.error("Failed to fetch host properties", error);
+
       } finally {
         setLoading(false);
       }

@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CustomDropdown } from "../../components/ui/CustomDropdown";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import PageLoader from "../../components/ui/PageLoader";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -92,7 +93,7 @@ export default function AdminBookings() {
     });
   };
 
-  if (loading) return <div className="p-6">Loading platform bookings...</div>;
+  if (loading) return <PageLoader variant="table" />;
 
   return (
     <div className="space-y-6">

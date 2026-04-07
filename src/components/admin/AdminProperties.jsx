@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { CustomDropdown } from "../../components/ui/CustomDropdown";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import PageLoader from "../../components/ui/PageLoader";
 
 export default function AdminProperties() {
   const [data, setData] = useState({
@@ -30,7 +31,7 @@ export default function AdminProperties() {
         setData(res.data);
       }
     } catch (err) {
-      console.error("Failed to load global properties", err);
+
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,7 @@ export default function AdminProperties() {
     });
   };
 
-  if (loading) return <div className="p-6">Loading properties...</div>;
+  if (loading) return <PageLoader variant="cards" />;
 
   return (
     <div className="space-y-6">

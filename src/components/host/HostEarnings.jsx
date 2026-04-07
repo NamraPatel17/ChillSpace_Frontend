@@ -1,6 +1,7 @@
-import { DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { IndianRupee, TrendingUp, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import PageLoader from "../ui/PageLoader";
 
 export default function HostEarnings() {
   const [earningsData, setEarningsData] = useState([]);
@@ -36,7 +37,7 @@ export default function HostEarnings() {
           averagePerBooking: res.data.averagePerBooking || 0
         });
       } catch (error) {
-        console.error("Failed to fetch host earnings", error);
+
       } finally {
         setLoading(false);
       }
@@ -54,7 +55,7 @@ export default function HostEarnings() {
     ? Math.max(...filteredChart.map(d => d.amount))
     : 100;
 
-  if (loading) return <div className="p-6">Loading earnings data...</div>;
+  if (loading) return <PageLoader variant="earnings" />;
 
   const periods = [
     { key: "all",         label: "All Time" },
@@ -84,7 +85,7 @@ export default function HostEarnings() {
               </p>
             </div>
             <div className="bg-green-100 p-3 rounded-lg">
-              <DollarSign className="h-6 w-6 text-green-600" />
+              <IndianRupee className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>

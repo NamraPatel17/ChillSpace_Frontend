@@ -60,7 +60,7 @@ export default function GuestMessages() {
         }
       }
     } catch(err) {
-      console.error(err);
+
     }
   }
 
@@ -78,7 +78,7 @@ export default function GuestMessages() {
       }));
       setMessages(mapped);
     } catch(err) {
-      console.error(err);
+
     }
   }
   
@@ -102,7 +102,7 @@ export default function GuestMessages() {
        fetchThread(selectedConversation.id);
        fetchConversations();
     } catch(err) {
-       console.error(err);
+
     }
   };
 

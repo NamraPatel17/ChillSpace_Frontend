@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Avatar } from "../../components/ui/avatar";
+import PageLoader from "../../components/ui/PageLoader";
 
 export default function AdminVerifications() {
   const [verifications, setVerifications] = useState([]);
@@ -24,7 +25,7 @@ export default function AdminVerifications() {
       }
     } catch (err) {
       toast.error("Failed to load verification queue");
-      console.error(err);
+
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ export default function AdminVerifications() {
     return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
   };
 
-  if (loading) return <div className="p-6">Loading verification queue...</div>;
+  if (loading) return <PageLoader variant="verifications" />;
 
   return (
     <div className="space-y-6">

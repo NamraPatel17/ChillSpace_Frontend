@@ -1,4 +1,5 @@
-import { Users, Home, Calendar, DollarSign, TrendingUp, ArrowUp } from "lucide-react";
+import { Users, Home, Calendar, IndianRupee, TrendingUp, ArrowUp } from "lucide-react";
+import PageLoader from "../ui/PageLoader";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -10,9 +11,13 @@ export default function AdminDashboard() {
       totalBookings: 0,
       revenue: 0
     },
-    performance: {
-      satisfaction: 0
+    changes: {
+      users:    { value: "0.0", direction: "neutral" },
+      listings: { value: "0.0", direction: "neutral" },
+      bookings: { value: "0.0", direction: "neutral" },
+      revenue:  { value: "0.0", direction: "neutral" }
     },
+    performance: { satisfaction: 0 },
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
@@ -28,7 +33,7 @@ export default function AdminDashboard() {
           setDashboardData(res.data);
         }
       } catch (err) {
-        console.error("Failed to load admin analytics", err);
+
       } finally {
         setLoading(false);
       }
@@ -36,11 +41,22 @@ export default function AdminDashboard() {
     fetchAnalytics();
   }, []);
 
+  // Helper: format change badge
+  const changeLabel = (ch) => {
+    if (!ch || ch.direction === "neutral") return { label: "0.0% vs last month", up: null };
+    return {
+      label: `${ch.value}% vs last month`,
+      up: ch.direction === "up"
+    };
+  };
+
+  const ch = dashboardData.changes || {};
+
   const stats = [
     {
       name: "Total Users",
       value: dashboardData.stats.totalUsers.toLocaleString(),
-      change: "+12.5%",
+      change: changeLabel(ch.users),
       icon: Users,
       color: "text-gray-900",
       bgColor: "bg-gray-50",
@@ -48,7 +64,7 @@ export default function AdminDashboard() {
     {
       name: "Active Listings",
       value: dashboardData.stats.activeListings.toLocaleString(),
-      change: "+8.2%",
+      change: changeLabel(ch.listings),
       icon: Home,
       color: "text-green-600",
       bgColor: "bg-green-50",
@@ -56,22 +72,22 @@ export default function AdminDashboard() {
     {
       name: "Total Bookings",
       value: dashboardData.stats.totalBookings.toLocaleString(),
-      change: "+23.1%",
+      change: changeLabel(ch.bookings),
       icon: Calendar,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
     },
     {
-      name: "Revenue",
+      name: "Platform Revenue",
       value: `₹${dashboardData.stats.revenue.toLocaleString()}`,
-      change: "+18.7%",
-      icon: DollarSign,
+      change: changeLabel(ch.revenue),
+      icon: IndianRupee,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
     },
   ];
 
-  if (loading) return <div className="p-6">Loading dashboard...</div>;
+  if (loading) return <PageLoader variant="dashboard" />;
 
   return (
     <div className="space-y-6">
@@ -97,9 +113,19 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="mt-4 flex items-center text-sm">
-                <ArrowUp className="h-4 w-4 text-green-600" />
-                <span className="text-green-600 ml-1">{stat.change}</span>
-                <span className="text-gray-500 ml-2">vs last month</span>
+                {stat.change.up === null ? (
+                  <span className="text-gray-400 ml-1">{stat.change.label}</span>
+                ) : stat.change.up ? (
+                  <>
+                    <ArrowUp className="h-4 w-4 text-green-600" />
+                    <span className="text-green-600 ml-1">{stat.change.label}</span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowUp className="h-4 w-4 text-red-500 rotate-180" />
+                    <span className="text-red-500 ml-1">{stat.change.label}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
