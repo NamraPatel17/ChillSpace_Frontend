@@ -131,30 +131,7 @@ Projects/
 
 ---
 
-## ⚙️ Environment Variables
 
-### Backend (`.env`)
-```env
-PORT=3000
-MONGO_URL=your_mongodb_atlas_connection_string
-JWT_SECRET=your_jwt_secret
-EMAIL_USER=your_email
-EMAIL_PASSWORD=your_email_app_password
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_key
-CLOUDINARY_API_SECRET=your_cloudinary_secret
-RAZORYPAY_API_KEY=your_razorpay_key
-RAZORYPAY_API_SECRET=your_razorpay_secret
-FRONTEND_URL=https://chillspace-frontend.vercel.app
-NODE_ENV=production
-```
-
-### Frontend (`.env`)
-```env
-VITE_API_BASE_URL=https://chillspace-backend.onrender.com
-```
-
----
 
 ## 🛠️ Local Development Setup
 
@@ -219,9 +196,7 @@ npm run dev
 
 ## 👩‍💻 Developed By
 
-**Namra Patel** — 8th Semester Internship Project  
-ChillSpace — Royal Internship 2026
-
+**Namra Patel**
 ---
 
 ## 📄 License
