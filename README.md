@@ -153,7 +153,7 @@ npm install
 ```
 
 ### 2. Configure environment files
-Create `.env` files in both folders using the variables listed above.
+Create `.env` files in both folders
 
 ### 3. Run locally
 ```bash
